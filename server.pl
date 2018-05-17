@@ -14,6 +14,18 @@
 :- use_module(library(css_write), [css//1, write_css/2]).
 :- use_module(library(list_util), [replicate/3]).
 
+% State
+
+init_state(State) :-
+    get_time(NowTs),
+    Today is integer(NowTs) div (3600 * 24),
+    End is Today + 7,
+    % get meals for user
+    State = _{start_date: Today,
+              end_date: End,
+              meals_per_day: 2,
+              meals: [_{name: "Pasta"},
+                      _{name: "Caldo Verde"}] }.
 
 go(Port) :-
     http_set_session_options([]),
@@ -25,25 +37,18 @@ go(Port) :-
 % main handler
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
+    init_state(State) ,
     reply_html_page(
         [title('Eating Plan'),
          \html_receive(css)],
-        \meal_plan_page
+        \meal_plan_page(State)
     ).
 
 include_css(CssDcg) -->
     { write_css(CssDcg, CssTxt) },
     html_post(css, style([], CssTxt)).
 
-meal_plan_page -->
-    % get meals for user
-    { get_time(NowTs),
-      Today is integer(NowTs) div (3600 * 24),
-      End is Today + 7,
-      State = _{start_date: Today,
-                end_date: End,
-                meals_per_day: 2,
-                meals: [] } },
+meal_plan_page(State) -->
     html([div(id(main),
               [div(class('parameters'),
                    % TODO: figure out how to make these vars work for "reactive"
@@ -55,15 +60,23 @@ meal_plan_page -->
                    label(["Meals per day",
                           input([type(number), value(State.meals_per_day)], [])])
                   ]),
-               div(class(meals),
-                   ul(\meal_items(State.meals))),
-               \calendar_page(State)])]).
+               div(class(meals), \meals(State)),
+               div(class('free-time'), \availability(State)),
+               div(class(schedule), [h2("Schedule"), \calendar(State)])])]).
 
+meals(State) -->
+    html([h2("Menu Options"),
+          ul(\meal_items(State.meals)) ]).
 meal_items([]) --> [].
 meal_items([Meal|Rest]) -->
     html(li(class(meal), Meal.name)), meal_items(Rest).
 
-calendar_page(State) -->
+availability(State) -->
+    html([h2("Availability"),
+          div([])
+            ]).
+
+calendar(State) -->
     html([\include_css(
               css(['.calendar'([display(flex),
                                 'flex-direction'(row)],
@@ -80,5 +93,10 @@ calendar_items(NSlots, S, E) -->
     { Next is S + 1,
       replicate(NSlots, div(class('meal-slot'), []), Slots) },
     html(div(class(day),
+             % TODO: show actual date
              [span(S)|Slots])),
     calendar_items(NSlots, Next, E).
+
+% make schedule
+
+suggest_schedule(State).
