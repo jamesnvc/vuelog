@@ -14,6 +14,11 @@
 :- use_module(library(css_write), [css//1, write_css/2]).
 :- use_module(library(list_util), [replicate/3]).
 
+% main start
+go(Port) :-
+    http_set_session_options([]),
+    http_server(http_dispatch, [port(Port)]).
+
 % State
 
 init_state(State) :-
@@ -24,12 +29,10 @@ init_state(State) :-
     State = _{start_date: Today,
               end_date: End,
               meals_per_day: 2,
-              meals: [_{name: "Pasta"},
-                      _{name: "Caldo Verde"}] }.
-
-go(Port) :-
-    http_set_session_options([]),
-    http_server(http_dispatch, [port(Port)]).
+              meals: [_{name: "Spaghetti d'olio",
+                        tags: [pasta]},
+                      _{name: "Caldo Verde",
+                        tags: [soup]}]}.
 
 % Routes
 :- http_handler(/, meal_plan_handler, []).
