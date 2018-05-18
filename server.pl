@@ -22,17 +22,23 @@ go(Port) :-
 % State
 
 init_state(State) :-
-    get_time(NowTs),
-    Today is integer(NowTs) div (3600 * 24),
-    End is Today + 7,
+    get_time(Start),
+    End is Start + 7*3600*24,
     % get meals for user
-    State = _{start_date: Today,
+    State = _{start_date: Start,
               end_date: End,
               meals_per_day: 2,
               meals: [_{name: "Spaghetti d'olio",
                         tags: [pasta]},
                       _{name: "Caldo Verde",
                         tags: [soup]}]}.
+
+ts_day(Ts, Day) :-
+    number(Ts), !,
+    format_time(string(Day), "%Y-%m-%d", Ts).
+ts_day(Ts, Day) :-
+    string(Day), !,
+    parse_time(Day, "%Y-%m-%d", Ts).
 
 % Routes
 :- http_handler(/, meal_plan_handler, []).
@@ -52,17 +58,19 @@ include_css(CssDcg) -->
     html_post(css, style([], CssTxt)).
 
 meal_plan_page(State) -->
+    { ts_day(State.start_date, StartDay),
+      ts_day(State.end_date, EndDay) },
     html([div(id(main),
               [div(class('parameters'),
                    % TODO: figure out how to make these vars work for "reactive"
                    % maybe have pengines re-evaluate the DCG?
                    [label(["Start Date",
-                           input([type(date), value(State.start_date)], [])]),
+                           input([type(date), value(StartDay)], [])]),
                     label(["End Date",
-                           input([type(date), value(State.end_date)], [])]),
-                   label(["Meals per day",
-                          input([type(number), value(State.meals_per_day)], [])])
-                  ]),
+                           input([type(date), value(EndDay)], [])]),
+                    label(["Meals per day",
+                           input([type(number), value(State.meals_per_day)], [])])
+                   ]),
                div(class(meals), \meals(State)),
                div(class('free-time'), \availability(State)),
                div(class(schedule), [h2("Schedule"), \calendar(State)])])]).
@@ -70,34 +78,39 @@ meal_plan_page(State) -->
 meals(State) -->
     html([h2("Menu Options"),
           ul(\meal_items(State.meals)) ]).
+
 meal_items([]) --> [].
 meal_items([Meal|Rest]) -->
     html(li(class(meal), Meal.name)), meal_items(Rest).
 
 availability(State) -->
     html([h2("Availability"),
-          div([])
-            ]).
+          div([])]).
+
+calendar_css -->
+    css(['.calendar'(
+             [display(flex),
+              'flex-direction'(row)],
+             '.day'([margin('0.5em')],
+                    '.meal-slot'([width('2em'),
+                                  height('2em'),
+                                  margin('0.5em'),
+                                  'background-color'(green)])))]).
 
 calendar(State) -->
-    html([\include_css(
-              css(['.calendar'([display(flex),
-                                'flex-direction'(row)],
-                               '.day'([margin('0.5em')],
-                                   '.meal-slot'([width('2em'),
-                                                 height('2em'),
-                                                 margin('0.5em'),
-                                                 'background-color'(green)])))])),
+    html([\include_css(calendar_css),
           div(class(calendar),
-              \calendar_items(State.meals_per_day, State.start_date, State.end_date))]).
+              \calendar_items(State.meals_per_day,
+                              State.start_date,
+                              State.end_date))]).
 
 calendar_items(_, D, D) --> [].
 calendar_items(NSlots, S, E) -->
-    { Next is S + 1,
-      replicate(NSlots, div(class('meal-slot'), []), Slots) },
+    { Next is S + 3600*24,
+      replicate(NSlots, div(class('meal-slot'), []), Slots),
+      ts_day(S, Day) },
     html(div(class(day),
-             % TODO: show actual date
-             [span(S)|Slots])),
+             [span(Day)|Slots])),
     calendar_items(NSlots, Next, E).
 
 % make schedule
