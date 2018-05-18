@@ -59,6 +59,12 @@ include_css(CssDcg) -->
     { write_css(CssDcg, CssTxt) },
     html_post(css, style([], CssTxt)).
 
+% new plan: hook up pengines, just write javascript for now to send
+% query when changing stuff. That query can then update the state
+% (which...will be stored for the user? or query will send state
+% along, I guess), then send the updated HTML and js can just
+% innerHTML it in
+
 meal_plan_page(State) -->
     { ts_day(State.start_date, StartDay),
       ts_day(State.end_date, EndDay) },
