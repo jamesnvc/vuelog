@@ -8,13 +8,9 @@
                                            http_session_retractall/1,
                                            http_session_data/1,
                                            http_set_session_options/1]).
-:- use_module(library(http/html_write), [html_post//2,
-                                         html_receive//1,
-                                         reply_html_page/2,
-                                         html//1]).
+:- use_module(library(http/html_write), [html_receive//1,
+                                         reply_html_page/2]).
 :- use_module(library(http/http_parameters), [http_parameters/3]).
-:- use_module(library(css_write), [css//1, write_css/2]).
-:- use_module(library(list_util), [replicate/3]).
 
 :- use_module(render, [meal_plan_page//1]).
 
@@ -40,13 +36,6 @@ init_state(State) :-
                         tags: [pasta]},
                       _{name: "Caldo Verde",
                         tags: [soup]}]}.
-
-ts_day(Ts, Day) :-
-    number(Ts), !,
-    format_time(string(Day), "%Y-%m-%d", Ts).
-ts_day(Ts, Day) :-
-    string(Day), !,
-    parse_time(Day, "%Y-%m-%d", Ts).
 
 % Routes
 :- http_handler(/, meal_plan_handler, []).

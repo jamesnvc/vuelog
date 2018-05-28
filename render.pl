@@ -1,5 +1,9 @@
 :- module(render, [meal_plan_page//1]).
 
+:- use_module(library(http/html_write), [html//1, html_post//2]).
+:- use_module(library(css_write), [css//1, write_css/2]).
+:- use_module(library(list_util), [replicate/3]).
+
 include_css(CssDcg) -->
     { write_css(CssDcg, CssTxt) },
     html_post(css, style([], CssTxt)).
@@ -50,6 +54,13 @@ calendar(State) -->
               \calendar_items(State.meals_per_day,
                               State.start_date,
                               State.end_date))]).
+
+ts_day(Ts, Day) :-
+    number(Ts), !,
+    format_time(string(Day), "%Y-%m-%d", Ts).
+ts_day(Ts, Day) :-
+    string(Day), !,
+    parse_time(Day, "%Y-%m-%d", Ts).
 
 calendar_items(_, D, D) --> [].
 calendar_items(NSlots, S, E) -->
