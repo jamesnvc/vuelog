@@ -48,8 +48,8 @@ meal_plan_handler(Request) :-
     reply_html_page(
         [title('Eating Plan'),
          \html_receive(css)],
-        \meal_plan_page(State)
-    ).
+        [\meal_plan_page(State),
+         script(src('/pengine/pengines.js'), [])]).
 
 % new plan: hook up pengines, just write javascript for now to send
 % query when changing stuff. That query can then update the state
