@@ -15,6 +15,7 @@
 :- use_module(render, [meal_plan_page//1]).
 
 % main start
+:- use_module(api).
 :- use_module(library(pengines)).
 :- pengine_application(meals_app).
 :- use_module(meals_app:api).
