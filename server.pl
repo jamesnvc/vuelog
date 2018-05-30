@@ -10,6 +10,8 @@
                                            http_set_session_options/1]).
 :- use_module(library(http/html_write), [html_receive//1,
                                          reply_html_page/2]).
+:- use_module(library(http/html_head), [html_resource/2, html_requires//1]).
+:- use_module(library(http/http_files), [http_reply_from_files/3]).
 :- use_module(library(http/http_parameters), [http_parameters/3]).
 
 :- use_module(render, [meal_plan_page//1]).
@@ -24,6 +26,32 @@ go(Port) :-
     http_set_session_options([]),
     http_server(http_dispatch, [port(Port)]).
 
+% Routes
+:- multifile http:location/3.
+:- dynamic http:location/3.
+http:location(js, '/js', []).
+user:file_search_path(js, './js').
+
+:- html_resource(app_script, [virtual(true),
+                              requires(['/pengine/pengines.js', js('app.js')]),
+                              ordered(true),
+                              mime_type(text/javascript)]).
+
+:- http_handler(js(.), http_reply_from_files('js/', []),
+                [priority(1000), prefix]).
+
+:- http_handler(/, meal_plan_handler, []).
+
+% main handler
+meal_plan_handler(Request) :-
+    memberchk(method(get), Request),
+    init_state(State) ,
+    reply_html_page(
+        [title('Eating Plan'),
+         \html_receive(css)],
+        [\meal_plan_page(State),
+         \html_requires(app_script)]).
+
 % State
 
 init_state(State) :-
@@ -37,25 +65,6 @@ init_state(State) :-
                         tags: [pasta]},
                       _{name: "Caldo Verde",
                         tags: [soup]}]}.
-
-% Routes
-:- http_handler(/, meal_plan_handler, []).
-
-% main handler
-meal_plan_handler(Request) :-
-    memberchk(method(get), Request),
-    init_state(State) ,
-    reply_html_page(
-        [title('Eating Plan'),
-         \html_receive(css)],
-        [\meal_plan_page(State),
-         script(src('/pengine/pengines.js'), [])]).
-
-% new plan: hook up pengines, just write javascript for now to send
-% query when changing stuff. That query can then update the state
-% (which...will be stored for the user? or query will send state
-% along, I guess), then send the updated HTML and js can just
-% innerHTML it in
 
 % make schedule
 suggest_schedule(_State).
