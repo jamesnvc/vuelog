@@ -1,38 +1,60 @@
 :- module(render, [meal_plan_page//1]).
 
 :- use_module(library(http/html_write), [html//1, html_post//2]).
+:- use_module(library(http/js_write), [javascript/4, js_expression//1]).
+:- use_module(library(http/json), [atom_json_term/3]).
 :- use_module(library(css_write), [css//1, write_css/2]).
 :- use_module(library(list_util), [replicate/3]).
+
+:- use_module(util, [ts_day/2]).
 
 include_css(CssDcg) -->
     { write_css(CssDcg, CssTxt) },
     html_post(css, style([], CssTxt)).
 
+include_js(JsTxt) -->
+    html_post(js, html(JsTxt)).
+
 meal_plan_page(State) -->
-    { ts_day(State.start_date, StartDay),
-      ts_day(State.end_date, EndDay) },
-    html([div(id(main),
+    html([div([id(app)],
               [div(class('parameters'),
-                   % TODO: figure out how to make these vars work for "reactive"
-                   % maybe have pengines re-evaluate the DCG?
                    [label(["Start Date",
-                           input([type(date), value(StartDay)], [])]),
+                           input([type(date), 'v-model'(start_day),
+                                  value(State.start_day)], [])]),
                     label(["End Date",
-                           input([type(date), value(EndDay)], [])]),
+                           input([type(date), 'v-model'(end_day),
+                                 value(State.end_day)], [])]),
                     label(["Meals per day",
-                           input([type(number), value(State.meals_per_day)], [])])
-                   ]),
+                           input([type(number), 'v-model'(meals_per_day),
+                                  value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
                div(class('free-time'), \availability(State)),
-               div(class(schedule), [h2("Schedule"), \calendar(State)])])]).
+               div(class(schedule), [h2("Schedule"), \calendar(State)])]),
+          \include_js(
+              script(type('text/javascript'),
+                     {|javascript(State)||
+                       var appEl = document.getElementById('app');
+                       var template = quenchVue.createAppTemplate(appEl);
+                       var app = new Vue({el: appEl, data: State, template: template});
+                      |})
+          )]).
 
 meals(State) -->
-    html([h2("Menu Options"),
-          ul(\meal_items(State.meals)) ]).
+    html([h2("Menu Options"), ul(\meal_items(State.meals, true))]).
 
-meal_items([]) --> [].
-meal_items([Meal|Rest]) -->
-    html(li(class(meal), Meal.name)), meal_items(Rest).
+% TODO: make some general way of doing this transform
+meal_items([], _) --> [].
+meal_items([Meal|Rest], true) -->
+    html(li([class(meal), 'v-for'("meal in meals"),
+             'v-text'("meal.name")],
+            Meal.name)),
+    meal_items(Rest, false).
+meal_items([Meal|Rest], false) -->
+    ["<!-- <q> -->"],
+    html(li([class(meal), 'v-for'("meal in meals"), 'v-text'("meal.name")],
+            Meal.name)),
+    ["<!-- </q> -->"],
+    meal_items(Rest, false).
 
 availability(_State) -->
     html([h2("Availability"),
@@ -49,18 +71,11 @@ calendar_css -->
                                   'background-color'(green)])))]).
 
 calendar(State) -->
+    { ts_day(StartTs, State.start_day),
+      ts_day(EndTs, State.end_day) },
     html([\include_css(calendar_css),
           div(class(calendar),
-              \calendar_items(State.meals_per_day,
-                              State.start_date,
-                              State.end_date))]).
-
-ts_day(Ts, Day) :-
-    number(Ts), !,
-    format_time(string(Day), "%Y-%m-%d", Ts).
-ts_day(Ts, Day) :-
-    string(Day), !,
-    parse_time(Day, "%Y-%m-%d", Ts).
+              \calendar_items(State.meals_per_day, StartTs, EndTs))]).
 
 calendar_items(_, D, D) --> [].
 calendar_items(NSlots, S, E) -->

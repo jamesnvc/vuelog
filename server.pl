@@ -9,11 +9,13 @@
                                            http_session_data/1,
                                            http_set_session_options/1]).
 :- use_module(library(http/html_write), [html_receive//1,
-                                         reply_html_page/2]).
+                                         html//1,
+                                         reply_html_page/3]).
 :- use_module(library(http/html_head), [html_resource/2, html_requires//1]).
 :- use_module(library(http/http_files), [http_reply_from_files/3]).
 :- use_module(library(http/http_parameters), [http_parameters/3]).
 
+:- use_module(util, [ts_day/2]).
 :- use_module(render, [meal_plan_page//1]).
 
 % main start
@@ -32,38 +34,52 @@ go(Port) :-
 http:location(js, '/js', []).
 user:file_search_path(js, './js').
 
-:- html_resource(app_script, [virtual(true),
-                              requires(['/pengine/pengines.js', js('app.js')]),
-                              ordered(true),
-                              mime_type(text/javascript)]).
+:% Don't emit newlines around tags (screws up prerendering)
+:- multifile html_write:layout/3.
+html_write:layout(_, 0-0, 0-0).
 
 :- http_handler(js(.), http_reply_from_files('js/', []),
                 [priority(1000), prefix]).
 
 :- http_handler(/, meal_plan_handler, []).
 
+:- multifile user:head//2.
+user:head(app, Head) -->
+    html(head([Head, \html_receive(css)])).
+
+:- multifile user:body//2.
+user:body(app, Body) -->
+    html(body([Body,
+               script(src('https://cdn.jsdelivr.net/npm/vue/dist/vue.js'), []),
+               script(src('https://unpkg.com/quench-vue/umd/quench-vue.min.js'), []),
+               script(src('/pengine/pengines.js'), []),
+               script(src('/js/app.js'), []),
+               \html_receive(js)])).
+
 % main handler
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
     init_state(State) ,
-    reply_html_page(
-        [title('Eating Plan'),
-         \html_receive(css)],
-        [\meal_plan_page(State),
-         \html_requires(app_script)]).
+    reply_html_page(app,
+        title('Eating Plan'),
+        \meal_plan_page(State)).
 
 % State
 
 init_state(State) :-
     get_time(Start),
     End is Start + 7*3600*24,
+    ts_day(Start, StartDay),
+    ts_day(End, EndDay),
     % get meals for user
-    State = _{start_date: Start,
-              end_date: End,
+    State = _{start_day: StartDay,
+              end_day: EndDay,
               meals_per_day: 2,
               meals: [_{name: "Spaghetti d'olio",
+                        id: 1,
                         tags: [pasta]},
                       _{name: "Caldo Verde",
+                        id: 2,
                         tags: [soup]}]}.
 
 % make schedule
