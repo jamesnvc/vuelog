@@ -8,12 +8,30 @@
 
 :- use_module(util, [ts_day/2]).
 
+% Helper predicates
+
 include_css(CssDcg) -->
     { write_css(CssDcg, CssTxt) },
     html_post(css, style([], CssTxt)).
 
 include_js(JsTxt) -->
     html_post(js, html(JsTxt)).
+
+:- meta_predicate listof(//, +).
+%% listof(DCG//1, Elements) generates a list of elements from a DCG
+%% (presumably html//1) to make them work with Quench Vue.
+listof(DCG, Elements) -->
+    listof(DCG, Elements, true).
+listof(_, [], _) --> [].
+listof(DCG, [E|Rest], true) -->
+    call(DCG, E), listof(DCG, Rest, false).
+listof(DCG, [E|Rest], false) -->
+    ["<!-- <q> -->"],
+    call(DCG, E),
+    ["<!-- </q> -->"],
+    listof(DCG, Rest, false).
+
+% Rendering pages
 
 meal_plan_page(State) -->
     html([div([id(app)],
@@ -50,22 +68,14 @@ meal_plan_page(State) -->
 
 meals(State) -->
     html([h2("Menu Options"),
-          ul(\meal_items(State.meals, true)),
+          ul(\meal_items(State.meals)),
           \add_meal]).
 
-% TODO: make some general way of doing this transform
-meal_items([], _) --> [].
-meal_items([Meal|Rest], true) -->
+meal_items(Meals) --> listof(meal_item, Meals).
+meal_item(Meal) -->
     html(li([class(meal), 'v-for'("meal in meals"),
              'v-text'("meal.name")],
-            Meal.name)),
-    meal_items(Rest, false).
-meal_items([Meal|Rest], false) -->
-    ["<!-- <q> -->"],
-    html(li([class(meal), 'v-for'("meal in meals"), 'v-text'("meal.name")],
-            Meal.name)),
-    ["<!-- </q> -->"],
-    meal_items(Rest, false).
+            Meal.name)).
 
 add_meal -->
     html(form(['@submit.prevent'("addMeal")],
