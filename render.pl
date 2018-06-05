@@ -28,19 +28,30 @@ meal_plan_page(State) -->
                            input([type(number), 'v-model'(meals_per_day),
                                   value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
-               div(class('free-time'), \availability(State)),
                div(class(schedule), [h2("Schedule"), \calendar(State)])]),
           \include_js(
               script(type('text/javascript'),
                      {|javascript(State)||
                        var appEl = document.getElementById('app');
                        var template = quenchVue.createAppTemplate(appEl);
-                       var app = new Vue({el: appEl, data: State, template: template});
+                       var app = new Vue(
+                        {el: appEl,
+                            data: State,
+                            template: template,
+                            methods: {addMeal: function(event) {
+                                              let name = event.target.elements["name"].value;
+                                              app.meals.push({name: name});
+                                              event.target.elements["name"].value = "";
+                                            }
+                                    }
+                        });
                       |})
           )]).
 
 meals(State) -->
-    html([h2("Menu Options"), ul(\meal_items(State.meals, true))]).
+    html([h2("Menu Options"),
+          ul(\meal_items(State.meals, true)),
+          \add_meal]).
 
 % TODO: make some general way of doing this transform
 meal_items([], _) --> [].
@@ -56,9 +67,10 @@ meal_items([Meal|Rest], false) -->
     ["<!-- </q> -->"],
     meal_items(Rest, false).
 
-availability(_State) -->
-    html([h2("Availability"),
-          div([])]).
+add_meal -->
+    html(form(['@submit.prevent'("addMeal")],
+              [input([type(text), name(name), placeholder('Food name')]),
+              input([type(submit), value('Add')])])).
 
 calendar_css -->
     css(['.calendar'(
@@ -70,6 +82,7 @@ calendar_css -->
                                   margin('0.5em'),
                                   'background-color'(green)])))]).
 
+% TODO: figure out how to make the calendar change...
 calendar(State) -->
     { ts_day(StartTs, State.start_day),
       ts_day(EndTs, State.end_day) },
