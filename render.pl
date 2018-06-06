@@ -33,6 +33,24 @@ listof(DCG, [E|Rest], false) -->
 
 % Rendering pages
 
+main_js(State) -->
+    include_js(
+        script(type('text/javascript'),
+               {|javascript(State)||
+                var appEl = document.getElementById('app');
+                var template = quenchVue.createAppTemplate(appEl);
+                var app = new Vue(
+                  {el: appEl,
+                   data: State,
+                   template: template,
+                   methods: {addMeal: function(event) {
+                     let name = event.target.elements["name"].value;
+                     app.meals.push({name: name});
+                     event.target.elements["name"].value = "";
+                   }}
+                  });
+     |})).
+
 meal_plan_page(State) -->
     html([div([id(app)],
               [div(class('parameters'),
@@ -47,24 +65,7 @@ meal_plan_page(State) -->
                                   value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
                div(class(schedule), [h2("Schedule"), \calendar(State)])]),
-          \include_js(
-              script(type('text/javascript'),
-                     {|javascript(State)||
-                       var appEl = document.getElementById('app');
-                       var template = quenchVue.createAppTemplate(appEl);
-                       var app = new Vue(
-                        {el: appEl,
-                            data: State,
-                            template: template,
-                            methods: {addMeal: function(event) {
-                                              let name = event.target.elements["name"].value;
-                                              app.meals.push({name: name});
-                                              event.target.elements["name"].value = "";
-                                            }
-                                    }
-                        });
-                      |})
-          )]).
+          \main_js(State)]).
 
 meals(State) -->
     html([h2("Menu Options"),
