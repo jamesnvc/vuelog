@@ -43,12 +43,18 @@ main_js(State) -->
                   {el: appEl,
                    data: State,
                    template: template,
-                   methods: {addMeal: function(event) {
-                     let name = event.target.elements["name"].value;
-                     app.meals.push({name: name});
-                     event.target.elements["name"].value = "";
-                   }}
-                  });
+                   methods: {
+                     addMeal: function(event) {
+                       let name = event.target.elements["name"].value;
+                       app.meals.push({name: name});
+                       event.target.elements["name"].value = "";
+                     },
+                     updateState: function(event) {
+                       let state = Object.keys(app.$data)
+                           .reduce((o, k) => { o[k] = app[k]; return o; }, {});
+                       window.updateState(state);
+                     }
+                   }});
      |})).
 
 meal_plan_page(State) -->
@@ -64,6 +70,7 @@ meal_plan_page(State) -->
                            input([type(number), 'v-model'(meals_per_day),
                                   value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
+               button('@click.prevent'(updateState), "Run"),
                div(class(schedule), [h2("Schedule"), \calendar(State)])]),
           \main_js(State)]).
 
