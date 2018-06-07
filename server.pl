@@ -29,14 +29,6 @@ go(Port) :-
     http_server(http_dispatch, [port(Port)]).
 
 % Routes
-:- multifile http:location/3.
-:- dynamic http:location/3.
-http:location(js, '/js', []).
-user:file_search_path(js, './js').
-
-:% Don't emit newlines around tags (screws up prerendering)
-:- multifile html_write:layout/3.
-html_write:layout(_, 0-0, 0-0).
 
 :- http_handler(js(.), http_reply_from_files('js/', []),
                 [priority(1000), prefix]).
@@ -53,7 +45,6 @@ user:body(app, Body) -->
                script(src('https://cdn.jsdelivr.net/npm/vue/dist/vue.js'), []),
                script(src('https://unpkg.com/quench-vue/umd/quench-vue.min.js'), []),
                script(src('/pengine/pengines.js'), []),
-               script(src('/js/app.js'), []),
                \html_receive(js)])).
 
 % main handler
