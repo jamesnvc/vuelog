@@ -30,9 +30,6 @@ go(Port) :-
 
 % Routes
 
-:- http_handler(js(.), http_reply_from_files('js/', []),
-                [priority(1000), prefix]).
-
 :- http_handler(/, meal_plan_handler, []).
 
 :- multifile user:head//2.
