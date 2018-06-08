@@ -15,7 +15,7 @@ include_css(CssDcg) -->
     html_post(css, style([], CssTxt)).
 
 include_js(JsTxt) -->
-    html_post(js, html(JsTxt)).
+    html_post(js, JsTxt).
 
 :- meta_predicate listof(//, +).
 %% listof(DCG//1, Elements) generates a list of elements from a DCG
