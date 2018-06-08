@@ -15,7 +15,6 @@
 :- use_module(library(http/http_files), [http_reply_from_files/3]).
 :- use_module(library(http/http_parameters), [http_parameters/3]).
 
-:- use_module(util, [ts_day/2]).
 :- use_module(render, [meal_plan_page//1]).
 
 % main start
@@ -47,28 +46,7 @@ user:body(app, Body) -->
 % main handler
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
-    init_state(State) ,
+    api:init_state(State) ,
     reply_html_page(app,
         title('Eating Plan'),
         \meal_plan_page(State)).
-
-% State
-
-init_state(State) :-
-    get_time(Start),
-    End is Start + 7*3600*24,
-    ts_day(Start, StartDay),
-    ts_day(End, EndDay),
-    % get meals for user
-    State = _{start_day: StartDay,
-              end_day: EndDay,
-              meals_per_day: 2,
-              meals: [_{name: "Spaghetti d'olio",
-                        id: 1,
-                        tags: [pasta]},
-                      _{name: "Caldo Verde",
-                        id: 2,
-                        tags: [soup]}]}.
-
-% make schedule
-suggest_schedule(_State).
