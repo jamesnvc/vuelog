@@ -46,7 +46,7 @@ user:body(app, Body) -->
 % main handler
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
-    api:init_state(State) ,
+    api:init_state(State),
     reply_html_page(app,
         title('Eating Plan'),
         \meal_plan_page(State)).
