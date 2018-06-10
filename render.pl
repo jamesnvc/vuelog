@@ -39,10 +39,35 @@ main_js(State) -->
                {|javascript(State)||
                 var appEl = document.getElementById('app');
                 var template = quenchVue.createAppTemplate(appEl);
+                var _updating = false;
+                var pengine = new Pengine({application: "meals_app",
+                                           onsuccess: function() {
+                                             const newState = this.data[0].S;
+                                             for (let k in newState) {
+                                               if (app[k] !== newState[k]) {
+                                                 app[k] = newState[k];
+                                               }
+                                             }
+                                             app.$nextTick(() => _updating = false);
+                                           },
+                                           onerror: function() {
+                                             console.error("Pengine error", this);
+                                             app.$nextTick(() => _updating = false);
+                                           }
+                                          });
                 var app = new Vue(
                   {el: appEl,
                    data: State,
                    template: template,
+                   beforeUpdate: function() {
+                     if (_updating) return;
+                     _updating = true;
+                     let state = Object.keys(app.$data)
+                         .reduce((o, k) => { o[k] = app[k]; return o; },
+                                 {});
+                     let stateJson = Pengine.stringify(state);
+                     pengine.ask(`handle_event(${stateJson}, update, S)`);
+                   },
                    methods: {
                      addMeal: function(event) {
                        let name = event.target.elements["name"].value;
@@ -54,16 +79,7 @@ main_js(State) -->
                            .reduce((o, k) => { o[k] = app[k]; return o; },
                                    {});
                        let stateJson = Pengine.stringify(state);
-                       new Pengine({application: "meals_app",
-                                    ask: `handle_event(${stateJson}, inc_meals, S)`,
-                                    onsuccess: function() {
-                                      console.log("SUCCESS", this.data);
-                                      console.log("new info ", this.data[0].S);
-                                      const newState = this.data[0].S;
-                                      for (let k in newState) {
-                                        app[k] = newState[k];
-                                      }
-                                    }});
+                       pengine.ask(`handle_event(${stateJson}, inc_meals, S)`);
                      }
                    }});
      |})).
@@ -78,7 +94,7 @@ meal_plan_page(State) -->
                            input([type(date), 'v-model'(end_day),
                                  value(State.end_day)], [])]),
                     label(["Meals per day",
-                           input([type(number), 'v-model'(meals_per_day),
+                           input([type(number), 'v-model.number'(meals_per_day),
                                   value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
                button('@click.prevent'(updateState), "Run"),

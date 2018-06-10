@@ -13,7 +13,7 @@ state_gen_slots(State0, State1) :-
     NSlots is round((EndTs - StartTs) / (3600*24)),
     debug(pengine, "Gen slots for ~w days", [NSlots]),
     length(Slots, NSlots),
-    random_between(0, 100, Test),
+    Test #= NSlots * PerDay,
     maplist({PerDay,Test}/[X]>>(
                 length(X, PerDay),
                 maplist(=(Test), X)
@@ -48,6 +48,9 @@ handle_event(State, inc_meals, OutState):-
     ensure_number(State.meals_per_day, MealsPerDay),
     IncMeals is MealsPerDay + 1,
     update_state(State.put(meals_per_day, IncMeals), OutState).
+
+handle_event(State0, update, State1) :-
+    update_state(State0, State1).
 
 handle_event(State, Event, State) :-
     debug(pengine, "Unknown Pengine event ~w ~w", [State, Event]).
