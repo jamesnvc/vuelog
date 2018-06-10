@@ -29,7 +29,7 @@ go(Port) :-
 
 % Routes
 
-:- http_handler(/, meal_plan_handler, []).
+:- http_handler(root(.), meal_plan_handler, []).
 
 :- multifile user:head//2.
 user:head(app, Head) -->
