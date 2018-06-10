@@ -91,6 +91,7 @@ meals(State) -->
           \add_meal]).
 
 meal_items(Meals) --> listof(meal_item, Meals).
+
 meal_item(Meal) -->
     html(li([class(meal), 'v-for'("meal in meals"),
              'v-text'("meal.name")],
@@ -113,17 +114,16 @@ calendar_css -->
 
 % TODO: figure out how to make the calendar change...
 calendar(State) -->
-    { ts_day(StartTs, State.start_day),
-      ts_day(EndTs, State.end_day) },
     html([\include_css(calendar_css),
           div(class(calendar),
-              \calendar_items(State.meals_per_day, StartTs, EndTs))]).
+              \listof(calendar_item, State.slots))]).
 
-calendar_items(_, D, D) --> [].
-calendar_items(NSlots, S, E) -->
-    { Next is S + 3600*24,
-      replicate(NSlots, div(class('meal-slot'), []), Slots),
-      ts_day(S, Day) },
-    html(div(class(day),
-             [span(Day)|Slots])),
-    calendar_items(NSlots, Next, E).
+calendar_item(Slot) -->
+    { Day = "foo" },
+    html(div([class(day), 'v-for'("slot in slots")],
+             [span(Day),
+              \listof(calendar_slot, Slot)])).
+
+calendar_slot(S) -->
+    html(div([class('meal-slot'), 'v-for'("x in slot"), 'v-text'(x)],
+             [S])).
