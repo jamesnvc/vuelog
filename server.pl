@@ -39,7 +39,7 @@ user:head(app, Head) -->
 user:body(app, Body) -->
     html(body([Body,
                script(src('https://cdn.jsdelivr.net/npm/vue/dist/vue.js'), []),
-               script(src('https://unpkg.com/quench-vue/umd/quench-vue.min.js'), []),
+               script(src('https://cdn.jsdelivr.net/npm/quench-vue@0.6.1/umd/quench-vue.min.js'), []),
                script(src('/pengine/pengines.js'), []),
                \html_receive(js)])).
 
