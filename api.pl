@@ -7,6 +7,13 @@
 
 % State calculations
 
+state_check_meals_type(State0, State1) :-
+    % because the meals-per-day field gets set by an input, sometimes
+    % it ends up as a string
+    ensure_number(State0.meals_per_day, MPD),
+    debug(pengine, "ensure meals per day ~w", [MPD]),
+    State1 = State0.put(meals_per_day, MPD).
+
 state_gen_slots(State0, State1) :-
     _{end_day: EndD, start_day: StartD, meals_per_day: PerDay} :< State0,
     ts_day(EndTs, EndD), ts_day(StartTs, StartD),
@@ -22,6 +29,8 @@ state_gen_slots(State0, State1) :-
     State1 = State0.put(slots, Slots).
 
 update_state -->
+    { debug(pengine, "update state", []) },
+    state_check_meals_type,
     state_gen_slots.
 
 init_state(State) :-
@@ -43,12 +52,6 @@ init_state(State) :-
 
 % Events
 
-handle_event(State, inc_meals, OutState):-
-    debug(pengine, "inc_meals event ~w", [State]),
-    ensure_number(State.meals_per_day, MealsPerDay),
-    IncMeals is MealsPerDay + 1,
-    update_state(State.put(meals_per_day, IncMeals), OutState).
-
 handle_event(State0, update, State1) :-
     update_state(State0, State1).
 
@@ -57,6 +60,7 @@ handle_event(State, Event, State) :-
 
 % Helpers
 
-ensure_number(N, N) :- number(N).
+ensure_number(N, N) :- number(N), !.
 ensure_number(S, N) :-
-    string(S), number_string(N, S).
+    string(S), number_string(N, S), !.
+ensure_number(_, 0).
