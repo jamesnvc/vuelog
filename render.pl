@@ -44,9 +44,7 @@ main_js(State) -->
                                            onsuccess: function() {
                                              const newState = this.data[0].S;
                                              for (let k in newState) {
-                                               if (app[k] !== newState[k]) {
-                                                 app[k] = newState[k];
-                                               }
+                                               app[k] = newState[k];
                                              }
                                              app.$nextTick(() => _updating = false);
                                            },
@@ -73,15 +71,7 @@ main_js(State) -->
                        let name = event.target.elements["name"].value;
                        app.meals.push({name: name});
                        event.target.elements["name"].value = "";
-                     },
-                     updateState: function(event) {
-                       let state = Object.keys(app.$data)
-                           .reduce((o, k) => { o[k] = app[k]; return o; },
-                                   {});
-                       let stateJson = Pengine.stringify(state);
-                       pengine.ask(`handle_event(${stateJson}, inc_meals, S)`);
-                     }
-                   }});
+                     }}});
      |})).
 
 meal_plan_page(State) -->
@@ -97,7 +87,6 @@ meal_plan_page(State) -->
                            input([type(number), 'v-model.number'(meals_per_day),
                                   value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
-               button('@click.prevent'(updateState), "Run"),
                div(class(schedule), [h2("Schedule"), \calendar(State)])]),
           \main_js(State)]).
 
