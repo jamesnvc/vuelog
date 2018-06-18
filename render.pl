@@ -117,7 +117,6 @@ calendar_css -->
                                   margin('0.5em'),
                                   'background-color'(green)])))]).
 
-% TODO: figure out how to make the calendar change...
 calendar(State) -->
     html([\include_css(calendar_css),
           div(class(calendar),
