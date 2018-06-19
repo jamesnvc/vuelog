@@ -90,6 +90,15 @@ meal_plan_page(State) -->
                div(class(schedule), [h2("Schedule"), \calendar(State)])]),
           \main_js(State)]).
 
+% XXX: right now, the places that use `listof' rely on the author to
+% name the arguments to the `v-for' bit correctly (e.g. for the list
+% of meal items in State.meals, the v-for needs to be looping over
+% "meals")
+% Idea: make the listof thing take the State and key & let it add the
+% appropriate v-for?
+% Issue: Nested loops, which instead rely on knowing the name the
+% thing in the outer loop was bound to (e.g. calendar_slot).
+
 meals(State) -->
     html([h2("Menu Options"),
           ul(\listof(meal_item, State.meals)),
