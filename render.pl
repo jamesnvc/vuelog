@@ -51,6 +51,7 @@ main_js(State) -->
                                            onerror: function() {
                                              console.error("Pengine error", this);
                                              app.$nextTick(() => _updating = false);
+                                             // TODO: handle error
                                            }
                                           });
                 var app = new Vue(
