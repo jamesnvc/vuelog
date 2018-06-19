@@ -103,8 +103,7 @@ add_meal -->
 
 calendar_css -->
     css(['.calendar'(
-             [display(flex),
-              'flex-direction'(row)],
+             [display(flex), 'flex-direction'(row)],
              '.day'([margin('0.5em')],
                     '.meal-slot'([width('2em'),
                                   height('2em'),
