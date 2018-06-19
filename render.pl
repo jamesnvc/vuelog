@@ -92,10 +92,8 @@ meal_plan_page(State) -->
 
 meals(State) -->
     html([h2("Menu Options"),
-          ul(\meal_items(State.meals)),
+          ul(\listof(meal_item, State.meals)),
           \add_meal]).
-
-meal_items(Meals) --> listof(meal_item, Meals).
 
 meal_item(Meal) -->
     html(li([class(meal), 'v-for'("meal in meals"),
