@@ -20,6 +20,7 @@ state_gen_slots(State0, State1) :-
     NSlots is round((EndTs - StartTs) / (3600*24)),
     debug(pengine, "Gen slots for ~w days", [NSlots]),
     length(Slots, NSlots),
+    % TODO: actually set the value of the slots to something that makes sense
     Test #= NSlots * PerDay,
     maplist({PerDay,Test}/[X]>>(
                 length(X, PerDay),
