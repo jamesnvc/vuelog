@@ -13,7 +13,6 @@
                                          reply_html_page/3]).
 :- use_module(library(http/html_head), [html_resource/2, html_requires//1]).
 :- use_module(library(http/http_files), [http_reply_from_files/3]).
-:- use_module(library(http/http_parameters), [http_parameters/3]).
 
 :- use_module(render, [meal_plan_page//1]).
 
