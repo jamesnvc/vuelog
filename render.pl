@@ -6,7 +6,7 @@
 :- use_module(library(css_write), [css//1, write_css/2]).
 :- use_module(library(list_util), [replicate/3]).
 
-:- use_module(util, [ts_day/2]).
+:- use_module(util, [ts_day/2, listof//2]).
 
 % Helper predicates
 
@@ -16,20 +16,6 @@ include_css(CssDcg) -->
 
 include_js(JsTxt) -->
     html_post(js, JsTxt).
-
-:- meta_predicate listof(//, +).
-%% listof(DCG//1, Elements) generates a list of elements from a DCG
-%% (presumably html//1) to make them work with Quench Vue.
-listof(DCG, Elements) -->
-    listof(DCG, Elements, true).
-listof(_, [], _) --> [].
-listof(DCG, [E|Rest], true) -->
-    call(DCG, E), listof(DCG, Rest, false).
-listof(DCG, [E|Rest], false) -->
-    ["<!-- <q> -->"],
-    call(DCG, E),
-    ["<!-- </q> -->"],
-    listof(DCG, Rest, false).
 
 % Rendering pages
 
