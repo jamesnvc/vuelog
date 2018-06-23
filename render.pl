@@ -116,11 +116,9 @@ calendar(State) -->
               \listof(calendar_item, State.slots))]).
 
 calendar_item(Slot) -->
-    { Day = "foo" },
     html(div([class(day), 'v-for'("slot in slots")],
-             [span(Day),
-              \listof(calendar_slot, Slot)])).
+             [span(['v-text'('slot.day')], Slot.day), \listof(calendar_slot, Slot.entries)])).
 
-calendar_slot(S) -->
-    html(div([class('meal-slot'), 'v-for'("x in slot"), 'v-text'(x)],
-             [S])).
+calendar_slot(E) -->
+    html(div([class('meal-slot'), 'v-for'("entry in slot.entries"), 'v-text'('entry.meal')],
+             [E.meal])).
