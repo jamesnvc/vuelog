@@ -126,5 +126,5 @@ calendar_item(Slot) -->
              [span(['v-text'('slot.day')], Slot.day), \listof(calendar_slot, Slot.entries)])).
 
 calendar_slot(E) -->
-    html(div([class('meal-slot'), 'v-for'("entry in slot.entries"), 'v-text'('entry.meal')],
-             [E.meal])).
+    html(div([class('meal-slot'), 'v-for'("entry in slot.entries"), 'v-text'('entry.name')],
+             [E.name])).
