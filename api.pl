@@ -3,6 +3,7 @@
 
 :- use_module(library(clpfd)).
 :- use_module(library(http/json), [atom_json_dict/3]).
+:- use_module(library(random), [random_member/2]).
 :- use_module(util, [ts_day/2]).
 
 % State calculations
@@ -24,8 +25,7 @@ state_gen_slots, [State1] -->
                   DayTs is StartTs + 3600*24*N,
                   ts_day(DayTs, Day),
                   length(Entries, PerDay),
-                  maplist({Meals}/[E]>>member(E, Meals), Entries),
-                  debug(pengine, "meals ~w entries ~w", [Meals, Entries])
+                  maplist({Meals}/[E]>>random_member(E, Meals), Entries)
               ), SlotNums, Slots),
       State1 = State0.put(slots, Slots) }.
 
@@ -53,6 +53,9 @@ init_state(State) :-
 
 handle_event(State0, update, State1) :-
     phrase(update_state, [State0], [State1]).
+
+handle_event(State0, rerun, State1) :-
+    phrase(state_gen_slots, [State0], [State1]).
 
 handle_event(State, Event, State) :-
     debug(pengine, "Unknown Pengine event ~w ~w", [State, Event]).

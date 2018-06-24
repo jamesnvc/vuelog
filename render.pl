@@ -58,7 +58,17 @@ main_js(State) -->
                        let name = event.target.elements["name"].value;
                        app.meals.push({name: name, tags: []});
                        event.target.elements["name"].value = "";
-                     }}});
+                     },
+                     regenSchedule: function(_event) {
+                       if (_updating) return;
+                       let state = Object.keys(app.$data)
+                           .reduce((o, k) => { o[k] = app[k]; return o; },
+                                   {});
+                       let stateJson = Pengine.stringify(state);
+                       _updating = true;
+                       pengine.ask(`handle_event(${stateJson}, rerun, S)`);
+                     }
+                   }});
      |})).
 
 meal_plan_page(State) -->
@@ -74,7 +84,10 @@ meal_plan_page(State) -->
                            input([type(number), 'v-model.number'(meals_per_day),
                                   value(State.meals_per_day)], [])])]),
                div(class(meals), \meals(State)),
-               div(class(schedule), [h2("Schedule"), \calendar(State)])]),
+               div(class(schedule), [h2("Schedule"),
+                                     button('@click.prevent'(regenSchedule),
+                                            "New Schedule"),
+                                     \calendar(State)])]),
           \main_js(State)]).
 
 % XXX: right now, the places that use `listof' rely on the author to
