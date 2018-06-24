@@ -56,7 +56,7 @@ main_js(State) -->
                    methods: {
                      addMeal: function(event) {
                        let name = event.target.elements["name"].value;
-                       app.meals.push({name: name});
+                       app.meals.push({name: name, tags: []});
                        event.target.elements["name"].value = "";
                      }}});
      |})).
@@ -92,9 +92,15 @@ meals(State) -->
           \add_meal]).
 
 meal_item(Meal) -->
-    html(li([class(meal), 'v-for'("meal in meals"),
-             'v-text'("meal.name")],
-            Meal.name)).
+    html(li([class(meal), 'v-for'("meal in meals")],
+            [span('v-text'('meal.name'), Meal.name),
+             br([]),
+             \listof(meal_tag, Meal.tags)])).
+
+meal_tag(Tag) -->
+    html(span('v-for'("tag in meal.tags"),
+              [span('v-text'(tag), Tag),
+               &(nbsp)])).
 
 add_meal -->
     html(form(['@submit.prevent'("addMeal")],

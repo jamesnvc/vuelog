@@ -43,11 +43,9 @@ init_state(State) :-
                end_day: EndDay,
                meals_per_day: 2,
                meals: [_{name: "Spaghetti d'olio",
-                         id: 1,
                          tags: [pasta]},
                        _{name: "Caldo Verde",
-                         id: 2,
-                         tags: [soup]}]},
+                         tags: [soup, portuguese]}]},
     phrase(update_state, [State0], [State]).
 
 % Events
