@@ -124,10 +124,11 @@ calendar_css -->
     css(['.calendar'(
              [display(flex), 'flex-direction'(row)],
              '.day'([margin('0.5em')],
-                    '.meal-slot'([width('2em'),
-                                  height('2em'),
+                    '.meal-slot'(['min-height'('2em'),
                                   margin('0.5em'),
-                                  'background-color'(green)])))]).
+                                  'text-align'(center),
+                                  'background-color'(darkgreen),
+                                  color(white)])))]).
 
 calendar(State) -->
     html([\include_css(calendar_css),
@@ -136,7 +137,8 @@ calendar(State) -->
 
 calendar_item(Slot) -->
     html(div([class(day), 'v-for'("slot in slots")],
-             [span(['v-text'('slot.day')], Slot.day), \listof(calendar_slot, Slot.entries)])).
+             [span(['v-text'('slot.day')], Slot.day),
+              \listof(calendar_slot, Slot.entries)])).
 
 calendar_slot(E) -->
     html(div([class('meal-slot'), 'v-for'("entry in slot.entries"), 'v-text'('entry.name')],
