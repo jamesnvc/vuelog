@@ -1,7 +1,6 @@
 :- module(api, [init_state/1, handle_event/3]).
 
 
-:- use_module(library(clpfd)).
 :- use_module(library(http/json), [atom_json_dict/3]).
 :- use_module(library(random), [random_member/2]).
 :- use_module(util, [ts_day/2]).
