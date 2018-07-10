@@ -34,6 +34,8 @@ update_state -->
     state_check_meals_type,
     state_gen_slots.
 
+%! init_state(-NewState:dict) is det.
+%  NewState is a dictionary representing the fresh app state.
 init_state(State) :-
     get_time(Start),
     End is Start + 7*3600*24,
@@ -51,17 +53,19 @@ init_state(State) :-
 
 % Events
 
+%! handle_event(+CurrentState:dict, +Event:atom, -NewState:dict) is det.
 handle_event(State0, update, State1) :-
-    phrase(update_state, [State0], [State1]).
-
+    phrase(update_state, [State0], [State1]), !.
 handle_event(State0, rerun, State1) :-
-    phrase(state_gen_slots, [State0], [State1]).
-
+    phrase(state_gen_slots, [State0], [State1]), !.
 handle_event(State, Event, State) :-
     debug(pengine, "Unknown Pengine event ~w ~w", [State, Event]).
 
 % Helpers
 
+%! ensure_number(+X:any, -N:number) is det.
+%  Unify N with X as a number, or zero if X isn't reasonably
+%  convertable to a number
 ensure_number(N, N) :- number(N), !.
 ensure_number(S, N) :-
     string(S), number_string(N, S), !.
