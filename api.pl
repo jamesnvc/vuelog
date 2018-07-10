@@ -16,18 +16,28 @@ state_gen_slots, [State1] -->
     [State0],
     { _{end_day: EndD, start_day: StartD, meals_per_day: PerDay, meals: Meals} :< State0,
       ts_day(EndTs, EndD), ts_day(StartTs, StartD),
-      NSlots is round((EndTs - StartTs) / (3600*24)),
-      numlist(0, NSlots, SlotNums),
+      NDays is round((EndTs - StartTs) / (3600*24)),
+      numlist(0, NDays, DayNums),
       maplist({PerDay,StartTs,Meals}/[N, _{entries: Entries, day: Day}]>>(
                   DayTs is StartTs + 3600*24*N,
                   ts_day(DayTs, Day),
                   length(Entries, PerDay),
                   maplist({Meals}/[E]>>random_member(E, Meals), Entries)
-              ), SlotNums, Slots),
+              ), DayNums, Slots),
       State1 = State0.put(slots, Slots) }.
+
+meal_mealordtags(Meal, NewMeal) :-
+    list_to_set(Meal.tags, TagsSet),
+    NewMeal = Meal.put(tags, TagsSet).
+
+state_make_tags_sets, [State1] -->
+    [State0],
+    { maplist(meal_ordtags, State0.meals, NewMeals),
+      State1 = State0.put(meals, NewMeals) }.
 
 update_state -->
     state_check_meals_type,
+    state_make_tags_sets,
     state_gen_slots.
 
 %! init_state(-NewState:dict) is det.
@@ -43,9 +53,9 @@ init_state(State) :-
                end_day: EndDay,
                meals_per_day: 1,
                meals: [_{name: "Spaghetti d'olio",
-                         tags: [pasta]},
+                         tags: [pasta, vege, pasta]},
                        _{name: "Caldo Verde",
-                         tags: [soup, portuguese]}]},
+                         tags: [vege, soup, portuguese]}]},
     phrase(update_state, [State0], [State]).
 
 % Events
@@ -68,3 +78,14 @@ ensure_number(N, N) :- number(N), !.
 ensure_number(S, N) :-
     string(S), number_string(N, S), !.
 ensure_number(_, 0).
+
+
+%! meals_score(+Meal1:dict, +Meal2:dict, -Score:int) is det.
+%
+%  Score is an integer indicating how "similiar" two meals are. 100 is
+%  identical, 0 is completely different.
+meals_score(M, M, 100).
+meals_score(M1, M2, S) :-
+    intersection(M1.tags, M2.tags, Common),
+    fail.
+meals_score(_, _, 0) :- !.
