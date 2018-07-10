@@ -31,6 +31,7 @@ update_state -->
     state_gen_slots.
 
 %! init_state(-NewState:dict) is det.
+%
 %  NewState is a dictionary representing the fresh app state.
 init_state(State) :-
     get_time(Start),
@@ -40,7 +41,7 @@ init_state(State) :-
     % get meals for user
     State0 = _{start_day: StartDay,
                end_day: EndDay,
-               meals_per_day: 2,
+               meals_per_day: 1,
                meals: [_{name: "Spaghetti d'olio",
                          tags: [pasta]},
                        _{name: "Caldo Verde",
@@ -60,6 +61,7 @@ handle_event(State, Event, State) :-
 % Helpers
 
 %! ensure_number(+X:any, -N:number) is det.
+%
 %  Unify N with X as a number, or zero if X isn't reasonably
 %  convertable to a number
 ensure_number(N, N) :- number(N), !.

@@ -10,8 +10,10 @@ ts_day(Ts, Day) :-
 
 
 :- meta_predicate listof(3, +, ?, ?).
-%! listof(DCG//1, Elements) generates a list of elements from a DCG
-%! (presumably html//1) to make them work with Quench Vue.
+%! listof(:DCG, +Elements:list)//.
+%
+%  Generates a list of elements from =DCG= (which presumably uses
+%  =html//1=) to make them work with Quench Vue.
 listof(DCG, Elements) -->
     listof(DCG, Elements, true).
 listof(_, [], _) --> [].
