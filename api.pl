@@ -10,7 +10,6 @@
 state_check_meals_type, [State1] -->
     [State0],
     { ensure_number(State0.meals_per_day, MPD),
-      debug(pengine, "ensure meals per day ~w", [MPD]),
       State1 = State0.put(meals_per_day, MPD) }.
 
 state_gen_slots, [State1] -->
@@ -18,7 +17,6 @@ state_gen_slots, [State1] -->
     { _{end_day: EndD, start_day: StartD, meals_per_day: PerDay, meals: Meals} :< State0,
       ts_day(EndTs, EndD), ts_day(StartTs, StartD),
       NSlots is round((EndTs - StartTs) / (3600*24)),
-      debug(pengine, "Gen slots for ~w days", [NSlots]),
       numlist(0, NSlots, SlotNums),
       maplist({PerDay,StartTs,Meals}/[N, _{entries: Entries, day: Day}]>>(
                   DayTs is StartTs + 3600*24*N,
@@ -29,7 +27,6 @@ state_gen_slots, [State1] -->
       State1 = State0.put(slots, Slots) }.
 
 update_state -->
-    { debug(pengine, "update state", []) },
     state_check_meals_type,
     state_gen_slots.
 
