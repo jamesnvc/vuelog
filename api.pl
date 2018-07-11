@@ -2,6 +2,9 @@
 
 
 :- use_module(library(http/json), [atom_json_dict/3]).
+:- use_module(library(ordsets), [list_to_ord_set/2,
+                                 ord_intersection/3,
+                                 ord_union/3]).
 :- use_module(library(random), [random_member/2]).
 :- use_module(util, [ts_day/2]).
 
@@ -27,7 +30,7 @@ state_gen_slots, [State1] -->
       State1 = State0.put(slots, Slots) }.
 
 meal_mealordtags(Meal, NewMeal) :-
-    list_to_set(Meal.tags, TagsSet),
+    list_to_ord_set(Meal.tags, TagsSet),
     NewMeal = Meal.put(tags, TagsSet).
 
 state_make_tags_sets, [State1] -->
@@ -86,9 +89,9 @@ ensure_number(_, 0).
 %  identical, 0 is completely different.
 meals_score(M, M, 100) :- !.
 meals_score(M1, M2, S) :-
-    intersection(M1.tags, M2.tags, I),
+    ord_intersection(M1.tags, M2.tags, I),
     length(I, IL),
-    union(M1.tags, M2.tags, U),
+    ord_union(M1.tags, M2.tags, U),
     length(U, UL),
     % add a little bit of a fudge factor, so two meals with the same
     % tags aren't the same as exactly the same meal.
