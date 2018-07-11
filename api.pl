@@ -32,7 +32,7 @@ meal_mealordtags(Meal, NewMeal) :-
 
 state_make_tags_sets, [State1] -->
     [State0],
-    { maplist(meal_ordtags, State0.meals, NewMeals),
+    { maplist(meal_mealordtags, State0.meals, NewMeals),
       State1 = State0.put(meals, NewMeals) }.
 
 update_state -->
