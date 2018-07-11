@@ -84,8 +84,12 @@ ensure_number(_, 0).
 %
 %  Score is an integer indicating how "similiar" two meals are. 100 is
 %  identical, 0 is completely different.
-meals_score(M, M, 100).
+meals_score(M, M, 100) :- !.
 meals_score(M1, M2, S) :-
-    intersection(M1.tags, M2.tags, Common),
-    fail.
-meals_score(_, _, 0) :- !.
+    intersection(M1.tags, M2.tags, I),
+    length(I, IL),
+    union(M1.tags, M2.tags, U),
+    length(U, UL),
+    % add a little bit of a fudge factor, so two meals with the same
+    % tags aren't the same as exactly the same meal.
+    S is integer(IL / (UL * 1.2) * 100).
