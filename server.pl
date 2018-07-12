@@ -1,3 +1,6 @@
+/** <module> Server
+* HTTP server for the meal planner.
+*/
 :- module(server, [go/1]).
 
 :- use_module(library(http/thread_httpd), [http_server/2]).

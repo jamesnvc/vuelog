@@ -1,3 +1,6 @@
+/** <module> Public API
+* State manipulation for the meal planner. This module is exposed via pengines.
+*/
 :- module(api, [init_state/1, handle_event/3]).
 
 

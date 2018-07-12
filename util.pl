@@ -1,3 +1,6 @@
+/** <module> Utilities
+* Helper predicates.
+*/
 :- module(util, [ts_day/2,
                 listof//2]).
 

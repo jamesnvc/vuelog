@@ -1,3 +1,6 @@
+/** <module> Rendering
+* Predicates for generating HTML, CSS, and Javascript.
+*/
 :- module(render, [meal_plan_page//1]).
 
 :- use_module(library(http/html_write), [html//1, html_post//2]).
