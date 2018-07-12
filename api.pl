@@ -29,10 +29,6 @@ state_gen_slots, [State1] -->
               ), DayNums, Slots),
       State1 = State0.put(slots, Slots) }.
 
-meal_mealordtags(Meal, NewMeal) :-
-    list_to_ord_set(Meal.tags, TagsSet),
-    NewMeal = Meal.put(tags, TagsSet).
-
 state_make_tags_sets, [State1] -->
     [State0],
     { maplist(meal_mealordtags, State0.meals, NewMeals),
@@ -81,6 +77,15 @@ handle_event(State, Event, State) :-
 
 % Helpers
 
+%! meal_mealordtags(+OldMeal:dict, -NewMeal:dict) is det.
+%  True when =NewMeal= is equivalent to =OldMeal= but with the =tags=
+%  list an ordered set.
+%  Pulling this out as a separate predicate because dict access in
+%  lambdas seems to have weird issues.
+meal_mealordtags(Meal, NewMeal) :-
+    list_to_ord_set(Meal.tags, TagsSet),
+    NewMeal = Meal.put(tags, TagsSet).
+
 %! ensure_number(+X:any, -N:number) is det.
 %  Unify N with X as a number, or zero if X isn't reasonably
 %  convertable to a number
@@ -94,7 +99,6 @@ ensure_number(_, 0).
 
 
 %! meals_score(+Meal1:dict, +Meal2:dict, -Score:int) is det.
-%
 %  =Score= is an integer indicating how "similiar" two meals are. 100 is
 %  identical, 0 is completely different.
 meals_score(M, M, 100) :- !.
@@ -108,10 +112,15 @@ meals_score(M1, M2, S) :-
     S is integer(IL / (UL * 1.2) * 100).
 
 
-%! meals_next_score(+Meals, +NextMeal, -Score) is det.
+%! meals_next_score(+Meals:list, +NextMeal:dict, -Score:int) is det.
+%  Calculate how good a fit =NextMeal= would be, given the previous
+%  list of meals =Meals=.
 %
-%  =Score= is an integer between 0 and 100, indicating how good a fit
-%  =NextMeal= would be, after =Meals=. 0 is a perfect fit, 100 is the worst.
+%  @arg Meals List of meals previously scheduled.
+%  @arg NextMeal Candidate meal to come next in the schedule.
+%  @arg Score Integer from 0 to 100 indicating how good a fit
+%              =NextMeal= would be. 0 is perfect fit, 100 is terrible.
+%  @see meals_score/3.
 meals_next_score([], _, 0).
 meals_next_score(Meals, Meal, S) :-
     maplist(meals_score(Meal), Meals, Scores),
