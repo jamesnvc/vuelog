@@ -127,5 +127,12 @@ meals_score(M1, M2, S) :-
 meals_next_score([], _, 0).
 meals_next_score(Meals, Meal, S) :-
     maplist(meals_score(Meal), Meals, Scores),
-    % make the scores drop off for recent
-    true.
+    length(Meals, NMeals),
+    numlist(1, NMeals, Ns),
+    maplist({NMeals}/[N, Score, AdjScore]>>(
+                % sigmoid function
+                Factor is (1 / (1 + exp(-6*(N / NMeals)))),
+                AdjScore is Factor * Score),
+            Ns, Scores, AdjustedScores),
+    sumlist(AdjustedScores, ScoreSum),
+    S is integer(ScoreSum / NMeals).
