@@ -96,3 +96,14 @@ meals_score(M1, M2, S) :-
     % add a little bit of a fudge factor, so two meals with the same
     % tags aren't the same as exactly the same meal.
     S is integer(IL / (UL * 1.2) * 100).
+
+
+%! meals_next_score(+Meals, +NextMeal, -Score) is det.
+%
+%  =Score= is an integer between 0 and 100, indicating how good a fit
+%  =NextMeal= would be, after =Meals=. 0 is a perfect fit, 100 is the worst.
+meals_next_score([], _, 0).
+meals_next_score(Meals, Meal, S) :-
+    maplist(meals_score(Meal), Meals, Scores),
+    % make the scores drop off for recent
+    true.
