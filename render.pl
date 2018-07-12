@@ -71,6 +71,12 @@ main_js(State) -->
                    }});
      |})).
 
+
+%! meal_plan_page(+State:dict)//
+%  @arg State A dict representing the app state.
+%  @see api:init_state/1.
+%
+%  DCG for the main page to display meal plans.
 meal_plan_page(State) -->
     html([div([id(app)],
               [div(class('parameters'),
