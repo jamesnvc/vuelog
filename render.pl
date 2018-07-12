@@ -58,9 +58,12 @@ main_js(State) -->
                    },
                    methods: {
                      addMeal: function(event) {
-                       let name = event.target.elements["name"].value;
-                       app.meals.push({name: name, tags: []});
-                       event.target.elements["name"].value = "";
+                       const name = event.target.elements["name"].value;
+                       const tags = event.target.elements["tags"].value.split(/,\s*/);
+                       app.meals.push({name: name, tags: tags});
+                       for (let attr in ["name", "tags"]) {
+                         event.target.elements[attr].value = "";
+                       }
                      },
                      regenSchedule: function(_event) {
                        if (_updating) return;
@@ -127,7 +130,8 @@ meal_tag(Tag) -->
 add_meal -->
     html(form(['@submit.prevent'("addMeal")],
               [input([type(text), name(name), placeholder('Food name')]),
-              input([type(submit), value('Add')])])).
+               input([type(text), name(tags), placeholder('Comma-separated tags')]),
+               input([type(submit), value('Add')])])).
 
 calendar_css -->
     css(['.calendar'(
