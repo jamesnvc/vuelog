@@ -22,6 +22,10 @@
 :- pengine_application(meals_app).
 :- use_module(meals_app:api).
 
+%! go(+Port) is det.
+%  Main entry point to start the server.
+%
+%  @arg Port Integer port number to start the server on.
 go(Port) :-
     http_set_session_options([]),
     http_server(http_dispatch, [port(Port)]).
@@ -42,7 +46,8 @@ user:body(app, Body) -->
                script(src('/pengine/pengines.js'), []),
                \html_receive(js)])).
 
-% main handler
+%! meal_plan_handler(+Request) is semidet.
+%  Handler for main meal plain page.
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
     api:init_state(State),

@@ -44,8 +44,9 @@ update_state -->
     state_gen_slots.
 
 %! init_state(-NewState:dict) is det.
+%  Create a fresh app state dict.
 %
-%  NewState is a dictionary representing the fresh app state.
+%  @arg NewState Dictionary representing the fresh app state.
 init_state(State) :-
     get_time(Start),
     End is Start + 7*3600*24,
@@ -64,6 +65,13 @@ init_state(State) :-
 % Events
 
 %! handle_event(+CurrentState:dict, +Event:atom, -NewState:dict) is det.
+%  Given the current state and an event, calculate what the next state
+%  will be.
+%
+%  @arg CurrentState Dictionary representing the current app state.
+%  @arg Event An atom representing a state transation.
+%  @arg NewState Dictionary representing the state that results from
+%                 applying =Event= to =CurrentState=.
 handle_event(State0, update, State1) :-
     phrase(update_state, [State0], [State1]), !.
 handle_event(State0, rerun, State1) :-
@@ -74,9 +82,11 @@ handle_event(State, Event, State) :-
 % Helpers
 
 %! ensure_number(+X:any, -N:number) is det.
-%
 %  Unify N with X as a number, or zero if X isn't reasonably
 %  convertable to a number
+%
+%  @arg X A number or a string.
+%  @arg N X coerced to a number.
 ensure_number(N, N) :- number(N), !.
 ensure_number(S, N) :-
     string(S), number_string(N, S), !.
@@ -85,7 +95,7 @@ ensure_number(_, 0).
 
 %! meals_score(+Meal1:dict, +Meal2:dict, -Score:int) is det.
 %
-%  Score is an integer indicating how "similiar" two meals are. 100 is
+%  =Score= is an integer indicating how "similiar" two meals are. 100 is
 %  identical, 0 is completely different.
 meals_score(M, M, 100) :- !.
 meals_score(M1, M2, S) :-
