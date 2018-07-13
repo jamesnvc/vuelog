@@ -29,20 +29,25 @@ main_js(State) -->
                 var appEl = document.getElementById('app');
                 var template = quenchVue.createAppTemplate(appEl);
                 var _updating = false;
-                var pengine = new Pengine({application: "meals_app",
-                                           onsuccess: function() {
-                                             const newState = this.data[0].S;
-                                             for (let k in newState) {
-                                               app[k] = newState[k];
-                                             }
-                                             app.$nextTick(() => _updating = false);
-                                           },
-                                           onerror: function() {
-                                             console.error("Pengine error", this);
-                                             app.$nextTick(() => _updating = false);
-                                             // TODO: handle error
-                                           }
-                                          });
+                var conf = {application: "meals_app",
+                            onsuccess: function() {
+                              const newState = this.data[0].S;
+                              for (let k in newState) {
+                                app[k] = newState[k];
+                              }
+                              if (this.data.more) {
+                                this.stop();
+                              }
+                              pengine = new Pengine(conf);
+                              app.$nextTick(() => _updating = false);
+                            },
+                            onerror: function() {
+                              console.error("Pengine error", this);
+                              app.$nextTick(() => _updating = false);
+                              pengine = new Pengine(conf);
+                            }
+                           };
+                var pengine = new Pengine(conf);
                 var app = new Vue(
                   {el: appEl,
                    data: State,
