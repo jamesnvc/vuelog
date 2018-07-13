@@ -12,6 +12,7 @@
 :- use_module(library(list_util), [minimum_with/3,
                                    iterate/3]).
 :- use_module(util, [ts_day/2, numlist_desc/3]).
+:- use_module(library(clpfd), [transpose/2]).
 
 % State calculations
 
@@ -25,13 +26,17 @@ state_gen_slots, [State1] -->
     { _{end_day: EndD, start_day: StartD, meals_per_day: PerDay, meals: Meals} :< State0,
       ts_day(EndTs, EndD), ts_day(StartTs, StartD),
       NDays is round((EndTs - StartTs) / (3600*24)),
-      numlist(0, NDays, DayNums),
-      maplist({PerDay,StartTs,Meals}/[N, _{entries: Entries, day: Day}]>>(
-                  DayTs is StartTs + 3600*24*N,
-                  ts_day(DayTs, Day),
-                  length(Entries, PerDay),
-                  maplist({Meals}/[E]>>random_member(E, Meals), Entries)
-              ), DayNums, Slots),
+      length(TSlots, PerDay),
+      maplist(schedule(Meals, NDays), TSlots),
+      transpose(TSlots, Slots_),
+      iterate({EndTs}/[D, Dn, D]>>(D =< EndTs, Dn is D + 3600*24),
+              StartTs, Days_),
+      % XXX: need to do this extra `take` because iterate/3 yields a
+      % lazy list (by with freeze/2? Not entirely sure how it works)
+      list_util:take(NDays, Days_, Days),
+      maplist({StartTs}/[DayTs, Entries, _{entries: Entries, day: Day}]>>(
+                  ts_day(DayTs, Day)
+              ), Days, Slots_, Slots),
       State1 = State0.put(slots, Slots) }.
 
 state_make_tags_sets, [State1] -->
@@ -54,13 +59,13 @@ init_state(State) :-
     ts_day(Start, StartDay),
     ts_day(End, EndDay),
     % get meals for user
-    State0 = _{start_day: StartDay,
-               end_day: EndDay,
-               meals_per_day: 1,
-               meals: [_{name: "Spaghetti d'olio",
-                         tags: [pasta, vege, pasta]},
-                       _{name: "Caldo Verde",
-                         tags: [vege, soup, portuguese]}]},
+    State0 = state{start_day: StartDay,
+                   end_day: EndDay,
+                   meals_per_day: 1,
+                   meals: [meal{name: "Spaghetti d'olio",
+                                tags: [pasta, vege, pasta]},
+                           meal{name: "Caldo Verde",
+                                tags: [vege, soup, portuguese]}]},
     phrase(update_state, [State0], [State]).
 
 % Events
@@ -127,7 +132,7 @@ meals_score(M1, M2, S) :-
 %  @arg Score Integer from 0 to 100 indicating how good a fit
 %              =NextMeal= would be. 0 is perfect fit, 100 is terrible.
 %  @see meals_score/3.
-meals_next_score([], _, 0).
+meals_next_score([], _, 0) :- !.
 meals_next_score(Meals, Meal, S) :-
     maplist(meals_score(Meal), Meals, Scores),
     length(Meals, NMeals),
@@ -137,14 +142,21 @@ meals_next_score(Meals, Meal, S) :-
                 Factor is (1 / (1 + exp(-6*(N / NMeals)))),
                 AdjScore is Factor * Score),
             Ns, Scores, AdjustedScores, Factors),
-    debug(xxx, "scores ~w", [AdjustedScores]),
     sumlist(AdjustedScores, ScoreSum),
     sumlist(Factors, FactorSum),
     S is integer(ScoreSum / FactorSum).
 
 best_next_meal(Meals, Schedule, NextMeal) :-
-    minimum_with(meals_next_score(Schedule), Meals, NextMeal),
-    debug(xxx, "min for ~w is ~w", [Schedule, NextMeal]).
+    minimum_with(meals_next_score(Schedule), Meals, NextMeal).
+
+schedule(Meals, N, Schedule) :-
+    schedule_(Meals, N, [], Schedule).
+schedule_(_, 0, Schedule, Schedule).
+schedule_(Meals, N, CurrentSchedule, Schedule) :-
+    N > 0,
+    best_next_meal(Meals, CurrentSchedule, NextMeal),
+    Nn is N - 1,
+    schedule_(Meals, Nn, [NextMeal|CurrentSchedule], Schedule).
 
 /*
 ?- meals_next_score([_{name: "Spaghetti d'olio",

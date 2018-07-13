@@ -40,7 +40,6 @@ listof(DCG, [E|Rest], false) -->
 %! numlist_desc(+A:int, +B:int, -C:list) is semidet.
 %  Like numlist/3 but makes a descending list.
 numlist_desc(A, B, C) :-
-    debug(xxx, "numlist ~w ~w", [A, B]),
     must_be(integer, A),
     must_be(integer, B),
     A >= B,
