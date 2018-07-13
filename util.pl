@@ -3,7 +3,8 @@
 */
 :- module(util, [ts_day/2,
                  listof//2,
-                 numlist_desc/3]).
+                 numlist_desc/3,
+                 shuffled/2]).
 
 %! ts_day(+Ts:timestamp, -Day:string) is det.
 %! ts_day(-Ts:timestamp, +Day:string) is semidet.
@@ -48,3 +49,9 @@ numlist_desc_(A, A, [A]) :- !.
 numlist_desc_(A, C, [A|D]) :-
     B is A - 1,
     numlist_desc_(B, C, D).
+
+%! shuffled(+L, -Shuffled) is det.
+shuffled([], []) :- !.
+shuffled(L, [X|ShufRest]) :-
+    random_select(X, L, Rest),
+    shuffled(Rest, ShufRest).

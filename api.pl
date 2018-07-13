@@ -9,9 +9,9 @@
                                  ord_intersection/3,
                                  ord_union/3]).
 :- use_module(library(random), [random_member/2]).
-:- use_module(library(list_util), [minimum_with/3,
+:- use_module(library(list_util), [minimum_by/3,
                                    iterate/3]).
-:- use_module(util, [ts_day/2, numlist_desc/3]).
+:- use_module(util, [ts_day/2, numlist_desc/3, shuffled/2]).
 :- use_module(library(clpfd), [transpose/2]).
 
 % State calculations
@@ -146,8 +146,17 @@ meals_next_score(Meals, Meal, S) :-
     sumlist(Factors, FactorSum),
     S is integer(ScoreSum / FactorSum).
 
+% making our own version of list_util:minimum_with/3 that just
+% compares the projected values. This implies that if two values
+% project to the same thing, the one that comes first will be
+% selected; we will take advantage of this by shuffling each time.
+minimum_with(Project, List, Minimum) :-
+    map_list_to_pairs(Project, List, Pairs),
+    list_util:minimum_by([O, T1-_, T2-_]>>compare(O, T1, T2), Pairs, _-Minimum).
+
 best_next_meal(Meals, Schedule, NextMeal) :-
-    minimum_with(meals_next_score(Schedule), Meals, NextMeal).
+    shuffled(Meals, RandMeals),
+    minimum_with(meals_next_score(Schedule), RandMeals, NextMeal).
 
 schedule(Meals, N, Schedule) :-
     schedule_(Meals, N, [], Schedule).
@@ -157,20 +166,3 @@ schedule_(Meals, N, CurrentSchedule, Schedule) :-
     best_next_meal(Meals, CurrentSchedule, NextMeal),
     Nn is N - 1,
     schedule_(Meals, Nn, [NextMeal|CurrentSchedule], Schedule).
-
-/*
-?- meals_next_score([_{name: "Spaghetti d'olio",
-                       tags: [pasta, vege, pasta]},
-                     _{name: "Spaghetti d'olio",
-                       tags: [pasta, vege, pasta]},
-                     _{name: "Spaghetti d'olio",
-                       tags: [pasta, vege, pasta]},
-                     _{name: "Spaghetti d'olio",
-                       tags: [pasta, vege, pasta]},
-                     _{name: "Sandwich", tags: [bread]},
-                     _{name: "Caldo Verde",
-                       tags: [vege, soup, portuguese]}],
-                    _{name: "Spaghetti d'olio",
-                      tags: [pasta, vege, pasta]},
-                    S), debug(xxx, "S ~w", [S]).
-*/
