@@ -9,7 +9,9 @@
                                  ord_intersection/3,
                                  ord_union/3]).
 :- use_module(library(random), [random_member/2]).
-:- use_module(util, [ts_day/2]).
+:- use_module(library(list_util), [minimum_with/3,
+                                   iterate/3]).
+:- use_module(util, [ts_day/2, numlist_desc/3]).
 
 % State calculations
 
@@ -119,7 +121,8 @@ meals_score(M1, M2, S) :-
 %  Calculate how good a fit =NextMeal= would be, given the previous
 %  list of meals =Meals=.
 %
-%  @arg Meals List of meals previously scheduled.
+%  @arg Meals List of meals previously scheduled. First element is the
+%              most recent one, last element is the first.
 %  @arg NextMeal Candidate meal to come next in the schedule.
 %  @arg Score Integer from 0 to 100 indicating how good a fit
 %              =NextMeal= would be. 0 is perfect fit, 100 is terrible.
@@ -128,11 +131,34 @@ meals_next_score([], _, 0).
 meals_next_score(Meals, Meal, S) :-
     maplist(meals_score(Meal), Meals, Scores),
     length(Meals, NMeals),
-    numlist(1, NMeals, Ns),
-    maplist({NMeals}/[N, Score, AdjScore]>>(
+    numlist_desc(NMeals, 1, Ns),
+    maplist({NMeals}/[N, Score, AdjScore, Factor]>>(
                 % sigmoid function
                 Factor is (1 / (1 + exp(-6*(N / NMeals)))),
                 AdjScore is Factor * Score),
-            Ns, Scores, AdjustedScores),
+            Ns, Scores, AdjustedScores, Factors),
+    debug(xxx, "scores ~w", [AdjustedScores]),
     sumlist(AdjustedScores, ScoreSum),
-    S is integer(ScoreSum / NMeals).
+    sumlist(Factors, FactorSum),
+    S is integer(ScoreSum / FactorSum).
+
+best_next_meal(Meals, Schedule, NextMeal) :-
+    minimum_with(meals_next_score(Schedule), Meals, NextMeal),
+    debug(xxx, "min for ~w is ~w", [Schedule, NextMeal]).
+
+/*
+?- meals_next_score([_{name: "Spaghetti d'olio",
+                       tags: [pasta, vege, pasta]},
+                     _{name: "Spaghetti d'olio",
+                       tags: [pasta, vege, pasta]},
+                     _{name: "Spaghetti d'olio",
+                       tags: [pasta, vege, pasta]},
+                     _{name: "Spaghetti d'olio",
+                       tags: [pasta, vege, pasta]},
+                     _{name: "Sandwich", tags: [bread]},
+                     _{name: "Caldo Verde",
+                       tags: [vege, soup, portuguese]}],
+                    _{name: "Spaghetti d'olio",
+                      tags: [pasta, vege, pasta]},
+                    S), debug(xxx, "S ~w", [S]).
+*/
