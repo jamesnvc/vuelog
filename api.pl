@@ -68,7 +68,10 @@ init_state(State) :-
                                 tags: [pasta, vege, pasta]},
                            meal{name: "Caldo Verde",
                                 days: 3,
-                                tags: [vege, soup, portuguese]}]},
+                                tags: [vege, soup, portuguese]},
+                           meal{name: "Steak",
+                                days: 1,
+                                tags: [meat]}]},
     phrase(update_state, [State0], [State]).
 
 % Events
@@ -159,6 +162,9 @@ minimum_with(Project, List, Minimum) :-
 
 best_next_meal(Meals, Schedule, NextMeal) :-
     shuffled(Meals, RandMeals),
+    % Note that minimum_by (which minimum_with calls) waits for the
+    % input list to be ground, so the dicts must have an actual tag,
+    % otherwise this doesn't unify properly
     minimum_with(meals_next_score(Schedule), RandMeals, NextMeal).
 
 meal_fits(N, Meal) :- Meal.days =< N.
