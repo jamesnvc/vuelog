@@ -10,9 +10,10 @@
                                  ord_union/3]).
 :- use_module(library(random), [random_member/2]).
 :- use_module(library(list_util), [minimum_by/3,
+                                   replicate/3,
                                    iterate/3]).
-:- use_module(util, [ts_day/2, numlist_desc/3, shuffled/2]).
 :- use_module(library(clpfd), [transpose/2]).
+:- use_module(util, [ts_day/2, numlist_desc/3, shuffled/2]).
 
 % State calculations
 
@@ -63,8 +64,10 @@ init_state(State) :-
                    end_day: EndDay,
                    meals_per_day: 1,
                    meals: [meal{name: "Spaghetti d'olio",
+                                days: 1,
                                 tags: [pasta, vege, pasta]},
                            meal{name: "Caldo Verde",
+                                days: 3,
                                 tags: [vege, soup, portuguese]}]},
     phrase(update_state, [State0], [State]).
 
@@ -158,11 +161,17 @@ best_next_meal(Meals, Schedule, NextMeal) :-
     shuffled(Meals, RandMeals),
     minimum_with(meals_next_score(Schedule), RandMeals, NextMeal).
 
+meal_fits(N, Meal) :- Meal.days =< N.
+
 schedule(Meals, N, Schedule) :-
-    schedule_(Meals, N, [], Schedule).
-schedule_(_, 0, Schedule, Schedule).
+    schedule_(Meals, N, [], RSchedule),
+    reverse(RSchedule, Schedule).
+schedule_(_, 0, Schedule, Schedule) :- !.
 schedule_(Meals, N, CurrentSchedule, Schedule) :-
     N > 0,
-    best_next_meal(Meals, CurrentSchedule, NextMeal),
-    Nn is N - 1,
-    schedule_(Meals, Nn, [NextMeal|CurrentSchedule], Schedule).
+    include(meal_fits(N), Meals, FilteredMeals),
+    best_next_meal(FilteredMeals, CurrentSchedule, NextMeal),
+    Nn is N - NextMeal.days,
+    replicate(NextMeal.days, NextMeal, NextMeals),
+    append(NextMeals, CurrentSchedule, NextSchedule),
+    schedule_(Meals, Nn, NextSchedule, Schedule).

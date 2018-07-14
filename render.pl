@@ -65,8 +65,9 @@ main_js(State) -->
                      addMeal: function(event) {
                        const name = event.target.elements["name"].value;
                        const tags = event.target.elements["tags"].value.split(/,\s*/);
-                       app.meals.push({name: name, tags: tags});
-                       for (let attr in ["name", "tags"]) {
+                       const days = parseInt(event.target.elements["days"].value, 10);
+                       app.meals.push({name: name, tags: tags, days: days});
+                       for (let attr in ["name", "tags", "days"]) {
                          event.target.elements[attr].value = "";
                        }
                      },
@@ -125,6 +126,9 @@ meal_item(Meal) -->
     html(li([class(meal), 'v-for'("meal in meals")],
             [span('v-text'('meal.name'), Meal.name),
              br([]),
+             span('Makes a meal for '), span('v-text'('meal.days'), Meal.days),
+             span(' days'),
+             br([]),
              \listof(meal_tag, Meal.tags)])).
 
 meal_tag(Tag) -->
@@ -136,6 +140,7 @@ add_meal -->
     html(form(['@submit.prevent'("addMeal")],
               [input([type(text), name(name), placeholder('Food name')]),
                input([type(text), name(tags), placeholder('Comma-separated tags')]),
+               input([type(number), name(days), placeholder('How many days will this last?')]),
                input([type(submit), value('Add')])])).
 
 calendar_css -->
