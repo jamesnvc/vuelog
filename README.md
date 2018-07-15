@@ -1,4 +1,4 @@
-# Meal Planner/Prolog Vue.js Integration
+# Meal Planner/Prolog Vue.js Integration Proof-of-Concept
 
 This project is an experiment in developing a way to make reactive webapps with Prolog.
 It is currently using Vue.js for the client-side.
