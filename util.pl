@@ -30,7 +30,8 @@ ts_day(Ts, Day) :-
 % XXX: If the list is empty, the template doesn't get put in place for
 % Vue to use later. I tried doing some hacks to generate the template
 % in the "<!-- <q> -->" thing, but that doesn't actually work; I guess
-% Vue needs to actually create the elements...
+% Vue needs to actually create the elements...is the solution to use a
+% <template> element?
 listof(DCG, Elements) -->
     listof(DCG, Elements, true).
 listof(_, [], _) --> [].
