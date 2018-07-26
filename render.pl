@@ -138,9 +138,12 @@ meal_tag(Tag) -->
 
 add_meal -->
     html(form(['@submit.prevent'("addMeal")],
-              [input([type(text), name(name), placeholder('Food name')]),
-               input([type(text), name(tags), placeholder('Comma-separated tags')]),
-               input([type(number), name(days), placeholder('How many days will this last?')]),
+              [input([type(text), name(name), required(true),
+                      placeholder('Food name')]),
+               input([type(text), name(tags), required(true),
+                      placeholder('Comma-separated tags')]),
+               input([type(number), name(days), required(true), min(1),
+                      placeholder('How many days will this last?')]),
                input([type(submit), value('Add')])])).
 
 calendar_css -->
