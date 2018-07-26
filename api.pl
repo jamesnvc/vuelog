@@ -24,6 +24,10 @@ state_check_meals_type, [State1] -->
 
 state_gen_slots, [State1] -->
     [State0],
+    { State0.meals = [], !,
+      State1 = State0.put(slots, []) }.
+state_gen_slots, [State1] -->
+    [State0],
     { _{end_day: EndD, start_day: StartD, meals_per_day: PerDay, meals: Meals} :< State0,
       ts_day(EndTs, EndD), ts_day(StartTs, StartD),
       NDays is round((EndTs - StartTs) / (3600*24)),
