@@ -169,3 +169,65 @@ calendar_item(Slot) -->
 calendar_slot(E) -->
     html(div([class('meal-slot'), 'v-for'("entry in slot.entries"), 'v-text'('entry.name')],
              [E.name])).
+
+		 /*******************************
+		 *               C		*
+		 *******************************/
+
+/*
+<script src="https://unpkg.com/vue"></script>
+
+
+<ul id="example-1">
+  <li v-for="item in items">
+    <p>{{ item.message }}</p>
+  </li>
+</ul>
+
+
+var example1 = new Vue({
+  el: '#example-1',
+  data: {
+    items: [
+
+    ]
+  }
+})
+
+*/
+
+my_little_list(State) -->
+    html(ul(id('example-1'),
+            v_for( [loop_var(item), loop_over(State.items)],
+                li(
+                    curlies('item.message')
+                )
+            )
+           )
+        ).
+
+my_little_list(State) -->
+    vue_ul_list(State, items,
+            p(curlies($message))
+           ).
+
+my_little_list(State) -->
+    vue_context(State,
+                \mll).
+
+mll -->
+        vue_list(ul, items,
+            p(['my message is ', $message])
+           ).
+
+
+
+my_little_list(State) -->
+    html(ul(id('example-1'),
+                li( 'v-for'("item in items"),
+                    vue('item.message')
+                )
+           )
+        ).
+
+

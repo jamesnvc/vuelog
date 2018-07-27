@@ -57,3 +57,4 @@ meal_plan_handler(Request) :-
     reply_html_page(app,
         title('Eating Plan'),
         \meal_plan_page(State)).
+
