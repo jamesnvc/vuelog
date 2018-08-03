@@ -5,11 +5,9 @@
 
 :- use_module(library(http/html_write), [html//1, html_post//2]).
 :- use_module(library(http/js_write), [javascript/4, js_expression//1]).
-:- use_module(library(http/json), [atom_json_term/3]).
 :- use_module(library(css_write), [css//1, write_css/2]).
-:- use_module(library(list_util), [replicate/3]).
 
-:- use_module(util, [ts_day/2, listof//2]).
+:- use_module(util, [listof//2]).
 
 % Helper predicates
 
@@ -170,9 +168,9 @@ calendar_slot(E) -->
     html(div([class('meal-slot'), 'v-for'("entry in slot.entries"), 'v-text'('entry.name')],
              [E.name])).
 
-		 /*******************************
-		 *               C		*
-		 *******************************/
+     /*******************************
+     *               C    *
+     *******************************/
 
 /*
 <script src="https://unpkg.com/vue"></script>
@@ -229,5 +227,3 @@ my_little_list(State) -->
                 )
            )
         ).
-
-
