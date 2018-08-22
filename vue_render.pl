@@ -47,7 +47,7 @@ meals -->
 
 
 add_meal -->
-    vue_html(vue_form([submit(addMeal)],
+    vue_html(vue_form(submit(addMeal),
                       [input([type(text), name(name), required(true),
                               placeholder('Food name')]),
                        input([type(text), name(tags), required(true),
@@ -77,4 +77,4 @@ calendar -->
 slots(Entries) -->
     vue_html(vue_list(entry in Entries,
                       div(class('meal-slot')),
-                      $('entry.name'))).
+                      $(entry.name))).
