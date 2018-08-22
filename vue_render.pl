@@ -16,14 +16,16 @@ meal_plan_page(State) -->
                 div([id(app)],
                     [div(class('parameters'),
                          [label(["Start Date",
-                                 vue_input([type(date), model(start_day)], [])]),
+                                 vue_input([type(date), model(start_day)])]),
                           label(["End Date",
-                                 vue_input([type(date), model(end_day)], [])]),
+                                 vue_input([type(date), model(end_day)])]),
                           label(["Meals per day",
                                  % XXX: some way to indicate that
                                  % meals_per_day should be treated as
                                  % a number?
-                                 vue_input([type(number), model(meals_per_day)], [])])]),
+                                 vue_input([type(number),
+                                            model(meals_per_day)],
+                                           [])])]),
                      div(class(meals), \meals),
                      div(class(schedule),
                          [h2("Schedule"),
@@ -32,16 +34,15 @@ meal_plan_page(State) -->
 
 meals -->
     vue_html([h2("Menu Options"),
-              ul(vue_list(
-                     [meal in meals],
+              ul(vue_list(meal in meals,
                      li([class(meal)]),
-                     [$meal.name,
+                     [$('meal.name'),
                       br([]),
-                      p(['Makes a meal for ', $meal.days, ' days']),
+                      p(['Makes a meal for ', $('meal.days'), ' days']),
                       br([]),
-                      vue_list([tag in $meal.tags],
+                      vue_list(tag in $('meal.tags'),
                                span,
-                               $tag)])),
+                               $(tag))])),
               \add_meal]).
 
 
@@ -68,12 +69,12 @@ calendar_css -->
 calendar -->
     vue_html([\include_css(calendar_css),
               div(class(calendar),
-                  vue_list([slot in slots],
+                  vue_list(slot in slots,
                            div(class(day)),
-                           [$slot.day, \slots($slot.entries)]))
+                           [$('slot.day'), \slots($('slot.entries'))]))
              ]).
 
 slots(Entries) -->
-    vue_html(vue_list([entry in Entries],
+    vue_html(vue_list(entry in Entries,
                       div(class('meal-slot')),
-                      $entry.name)).
+                      $('entry.name'))).
