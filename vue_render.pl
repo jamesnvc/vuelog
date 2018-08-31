@@ -23,9 +23,7 @@ meal_plan_page(State) -->
                                  % XXX: some way to indicate that
                                  % meals_per_day should be treated as
                                  % a number?
-                                 vue_input([type(number),
-                                            model(meals_per_day)],
-                                           [])])]),
+                                 vue_input([type(number), model(meals_per_day)])])]),
                      div(class(meals), \meals),
                      div(class(schedule),
                          [h2("Schedule"),
@@ -40,7 +38,7 @@ meals -->
                          br([]),
                          p(['Makes a meal for ', $('meal.days'), ' days']),
                          br([]),
-                         vue_list(tag in $('meal.tags'),
+                         vue_list(tag in 'meal.tags',
                                   span([], $(tag)))]))),
               \add_meal]).
 
@@ -70,7 +68,7 @@ calendar -->
               div(class(calendar),
                   vue_list(slot in slots,
                            div(class(day),
-                               [$('slot.day'), \slots($('slot.entries'))])))
+                               [$('slot.day'), \slots('slot.entries')])))
              ]).
 
 slots(Entries) -->

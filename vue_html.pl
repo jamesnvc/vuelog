@@ -36,7 +36,7 @@ vue_context(State, Elt, Stuff) -->
                                pengine = new Pengine(conf);
                              }
                             };
-                 var pengine = new Pengine(conf);
+                 // var pengine = new Pengine(conf);
                  const updateFn = (event) => {
                    if (_updating) return;
                    _updating = true;
@@ -49,12 +49,15 @@ vue_context(State, Elt, Stuff) -->
                  var app = new Vue(
                    {el: appEl,
                     data: State,
+                    /*
                     beforeUpdate: function() {
                       updateFn('update');
                     },
+*/
                     methods: {
                       handleEvent: function(eventName, event) {
-                        updateFn(eventName);
+                        // updateFn(eventName);
+                        console.log("event", arguments);
                       }
                     }
                    });
@@ -84,6 +87,9 @@ vue_html_expand(vue_form(submit(Event), Elements),
 vue_html_expand(vue_input(Attrs),
                 input(['v-model'(Prop)|OutAttrs], [])) :-
     selectchk(model(Prop), Attrs, OutAttrs).
+vue_html_expand(vue_button(click(Event), Text),
+                button('@click'('handleEvent(' + Event + ')'),
+                       Text)).
 vue_html_expand(vue_list(in(Key, Vals),
                          Container),
                 ListTemplateElt) :-
