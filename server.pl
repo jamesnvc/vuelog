@@ -17,7 +17,8 @@
 :- use_module(library(http/html_head), [html_resource/2, html_requires//1]).
 :- use_module(library(http/http_files), [http_reply_from_files/3]).
 
-:- use_module(render, [meal_plan_page//1]).
+%% :- use_module(render, [meal_plan_page//1]).
+:- use_module(vue_render, [meal_plan_page//1]).
 
 % main start
 :- use_module(api).
@@ -45,7 +46,7 @@ user:head(app, Head) -->
 user:body(app, Body) -->
     html(body([Body,
                script(src('https://cdn.jsdelivr.net/npm/vue/dist/vue.js'), []),
-               script(src('https://cdn.jsdelivr.net/npm/quench-vue@0.6.1/umd/quench-vue.min.js'), []),
+               script(src('https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js'), []),
                script(src('/pengine/pengines.js'), []),
                \html_receive(js)])).
 
@@ -57,4 +58,3 @@ meal_plan_handler(Request) :-
     reply_html_page(app,
         title('Eating Plan'),
         \meal_plan_page(State)).
-
