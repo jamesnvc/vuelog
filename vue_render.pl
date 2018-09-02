@@ -12,7 +12,9 @@ include_css(CssDcg) -->
     html_post(css, style([], CssTxt)).
 
 meal_plan_page(State) -->
-    vue_context(State, app,
+    vue_context(State, % app state
+                meals_app, % name of pengine app
+                app, % id of element
                 div([id(app)],
                     [div(class('parameters'),
                          [label(["Start Date",
@@ -39,7 +41,7 @@ meals -->
                          p(['Makes a meal for ', $('meal.days'), ' days']),
                          br([]),
                          vue_list(tag in 'meal.tags',
-                                  span([], $(tag)))]))),
+                                  span([], [$(tag), &(nbsp)]))]))),
               \add_meal]).
 
 

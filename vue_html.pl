@@ -1,5 +1,5 @@
 :- module(vue_html, [vue_html//1,
-                     vue_context//3,
+                     vue_context//4,
                      qvue_html/2,
                      op(400, xfx, in)
                     ]).
@@ -12,13 +12,13 @@
 include_js(JsTxt) -->
     html_post(js, JsTxt).
 
-:- meta_predicate vue_context(+, +, :, -, +).
-vue_context(State, Elt, Stuff) -->
+:- meta_predicate vue_context(+, +, +, :, -, +).
+vue_context(State, PengineName, Elt, Stuff) -->
     include_js(script(type('text/javascript'),
-                {|javascript(State, Elt)||
+                {|javascript(State, PengineName, Elt)||
                  var appEl = document.getElementById(Elt);
                  var _updating = false;
-                 var conf = {application: "vuelog_app",
+                 var conf = {application: PengineName,
                              onsuccess: function() {
                                const newState = this.data[0].S;
                                for (let k in newState) {
@@ -36,7 +36,7 @@ vue_context(State, Elt, Stuff) -->
                                pengine = new Pengine(conf);
                              }
                             };
-                 // var pengine = new Pengine(conf);
+                 var pengine = new Pengine(conf);
                  const updateFn = (event) => {
                    if (_updating) return;
                    _updating = true;
@@ -49,11 +49,10 @@ vue_context(State, Elt, Stuff) -->
                  var app = new Vue(
                    {el: appEl,
                     data: State,
-                    /*
                     beforeUpdate: function() {
                       updateFn('update');
+                      // console.log("Update");
                     },
-*/
                     methods: {
                       handleEvent: function(eventName, event) {
                         // updateFn(eventName);
@@ -81,7 +80,7 @@ qvue_html(Spec, ExSpec) :-
 vue_html_expand(Tok, Tok) :- atomic(Tok).
 vue_html_expand(\Term, \Term).
 vue_html_expand(vue_form(submit(Event), Elements),
-                form(['@submit'('handleEvent(' + Event + ')')],
+                form(['@submit.prevent'('handleEvent("' + Event + '", $event)')],
                      ExElements)) :-
     qvue_html(Elements, ExElements).
 vue_html_expand(vue_input(Attrs),
