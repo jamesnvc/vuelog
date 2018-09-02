@@ -40,10 +40,10 @@ vue_context(State, PengineName, Elt, Stuff) -->
                  const updateFn = (event) => {
                    if (_updating) return;
                    _updating = true;
-                   let state = Object.keys(app.$data)
-                       .reduce((o, k) => { o[k] = app[k]; return o; },
-                               {});
-                   let stateJson = Pengine.stringify(state);
+                   const state = Object.keys(app.$data)
+                         .reduce((o, k) => { o[k] = app[k]; return o; },
+                                 {});
+                   const stateJson = Pengine.stringify(state);
                    pengine.ask(`handle_event(${stateJson}, ${event}, S)`);
                  };
                  var app = new Vue(
@@ -54,9 +54,19 @@ vue_context(State, PengineName, Elt, Stuff) -->
                       // console.log("Update");
                     },
                     methods: {
-                      handleEvent: function(eventName, event) {
-                        // updateFn(eventName);
-                        console.log("event", arguments);
+                      handleFormEvent: function(eventName, event) {
+                        let formArgs = {};
+                        for (const k of event.target.elements) {
+                          if (k.type !== 'submit') {
+                            formArgs[k.name] = k.value;
+                            k.value = null;
+                          }
+                        }
+                        const eventArgs = Pengine.stringify(formArgs);
+                        updateFn(`${eventName}(${eventArgs})`);
+                      },
+                      handleEvent: function(eventName) {
+                        updateFn(eventName);
                       }
                     }
                    });
@@ -80,14 +90,14 @@ qvue_html(Spec, ExSpec) :-
 vue_html_expand(Tok, Tok) :- atomic(Tok).
 vue_html_expand(\Term, \Term).
 vue_html_expand(vue_form(submit(Event), Elements),
-                form(['@submit.prevent'('handleEvent("' + Event + '", $event)')],
+                form(['@submit.prevent'('handleFormEvent("' + Event + '", $event)')],
                      ExElements)) :-
     qvue_html(Elements, ExElements).
 vue_html_expand(vue_input(Attrs),
                 input(['v-model'(Prop)|OutAttrs], [])) :-
     selectchk(model(Prop), Attrs, OutAttrs).
 vue_html_expand(vue_button(click(Event), Text),
-                button('@click'('handleEvent(' + Event + ')'),
+                button('@click'('handleEvent("' + Event + '")'),
                        Text)).
 vue_html_expand(vue_list(in(Key, Vals),
                          Container),

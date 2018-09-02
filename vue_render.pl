@@ -29,7 +29,7 @@ meal_plan_page(State) -->
                      div(class(meals), \meals),
                      div(class(schedule),
                          [h2("Schedule"),
-                          vue_button(click(regenSchedule), "New Schedule"),
+                          vue_button(click(rerun), "New Schedule"),
                           \calendar])])).
 
 meals -->

@@ -10,6 +10,7 @@
                                  ord_union/3]).
 :- use_module(library(random), [random_member/2]).
 :- use_module(library(list_util), [minimum_by/3,
+                                   split/3,
                                    replicate/3,
                                    iterate/3]).
 :- use_module(library(clpfd), [transpose/2]).
@@ -54,6 +55,15 @@ update_state -->
     state_make_tags_sets,
     state_gen_slots.
 
+add_meal_(NewMeal), [State1] -->
+    [State0],
+    { Meals = [NewMeal|State0.meals],
+      State1 = State0.put(meals, Meals) }.
+
+add_meal(NewMeal) -->
+    add_meal_(NewMeal),
+    update_state.
+
 %! init_state(-NewState:dict) is det.
 %  Create a fresh app state dict.
 %
@@ -92,6 +102,15 @@ handle_event(State0, update, State1) :-
     phrase(update_state, [State0], [State1]), !.
 handle_event(State0, rerun, State1) :-
     phrase(state_gen_slots, [State0], [State1]), !.
+handle_event(State0,
+             add_meal(js{days: DaysStr, name: Name, tags: TagsStr}),
+             State1) :-
+    string_codes(TagsStr, TagsCodes),
+    split(TagsCodes, 0',, TagsCodesList),
+    maplist(atom_codes, Tags, TagsCodesList),
+    number_string(Days, DaysStr),
+    NewMeal = meal{name: Name, days: Days, tags: Tags},
+    phrase(add_meal(NewMeal), [State0], [State1]), !.
 handle_event(State, Event, State) :-
     debug(pengine, "Unknown Pengine event ~w ~w", [State, Event]).
 
