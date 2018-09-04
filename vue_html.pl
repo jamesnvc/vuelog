@@ -1,5 +1,5 @@
 :- module(vue_html, [vue_html//1,
-                     vue_context//4,
+                     vue_context//2,
                      qvue_html/2,
                      op(400, xfx, in)
                     ]).
@@ -12,11 +12,14 @@
 include_js(JsTxt) -->
     html_post(js, JsTxt).
 
-:- meta_predicate vue_context(+, +, +, :, -, +).
-vue_context(State, PengineName, Elt, Stuff) -->
+:- meta_predicate vue_context(+, :, -, +).
+vue_context(CtxDict, Stuff) -->
+    { _{initial_state: State,
+        pengine_app_name: PengineName,
+        root_element_sel: Elt} :< CtxDict },
     include_js(script(type('text/javascript'),
                 {|javascript(State, PengineName, Elt)||
-                 var appEl = document.getElementById(Elt);
+                 var appEl = document.querySelector(Elt);
                  var _updating = false;
                  var conf = {application: PengineName,
                              onsuccess: function() {
