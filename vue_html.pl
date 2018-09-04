@@ -103,12 +103,12 @@ vue_html_expand(vue_list(in(Key, Vals),
                          Container),
                 ListTemplateElt) :-
     Container =.. [ContainerElt, Props_, Children],
-    format(atom(BindingAtom), "~w in ~w", [Key, Vals]),
+    format(string(BindingAtom), "~w in ~w", [Key, Vals]),
     Props = ['v-for'(BindingAtom)|Props_],
     qvue_html(Children, TemplateBody),
     ListTemplateElt =.. [ContainerElt, Props, TemplateBody].
 vue_html_expand($(Var), TemplateVar) :-
-    format(atom(TemplateVar), "{{ ~w }}", [Var]).
+    format(string(TemplateVar), "{{ ~w }}", [Var]).
 vue_html_expand(ElAttrsChildren, ExElt) :-
     ElAttrsChildren =.. [El, Attrs, Children],
     qvue_html(Children, ExChildren),
