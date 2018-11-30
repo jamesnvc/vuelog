@@ -166,14 +166,13 @@ meals_next_score(Meals, Meal, S) :-
     maplist(meals_score(Meal), Meals, Scores),
     length(Meals, NMeals),
     numlist_desc(NMeals, 1, Ns),
-    maplist({NMeals}/[N, Score, AdjScore, Factor]>>(
+    maplist({NMeals}/[N, Score, AdjScore]>>(
                 % sigmoid function
                 Factor is (1 / (1 + exp(-6*(N / NMeals)))),
                 AdjScore is Factor * Score),
-            Ns, Scores, AdjustedScores, Factors),
+            Ns, Scores, AdjustedScores),
     sumlist(AdjustedScores, ScoreSum),
-    sumlist(Factors, FactorSum),
-    S is integer(ScoreSum / FactorSum).
+    S is integer(ScoreSum / NMeals).
 
 % making our own version of list_util:minimum_with/3 that just
 % compares the projected values. This implies that if two values
