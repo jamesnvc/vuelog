@@ -7,9 +7,10 @@ It is currently using Vue.js for the client-side.
 
 Query
 
-   pack_install(css_write).
-   pack_install(list_util).
-
+```prolog
+pack_install(css_write).
+pack_install(list_util).
+```
 
 ## to run
 
