@@ -1,7 +1,7 @@
-/** <module> Server
-* HTTP server for the meal planner.
+/** <module> Example server
+* Demo of the Vue/Pengine integration
 */
-:- module(server, [go/1]).
+:- module(example_server, [go/1]).
 
 :- use_module(library(http/thread_httpd), [http_server/2]).
 :- use_module(library(http/http_dispatch), [http_redirect/3,

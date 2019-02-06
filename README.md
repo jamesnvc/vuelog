@@ -1,18 +1,19 @@
-# Meal Planner/Prolog Vue.js Integration Proof-of-Concept
+# Prolog Vue.js Integration Proof-of-Concept
 
 This project is an experiment in developing a way to make reactive webapps with Prolog.
 It is currently using Vue.js for the client-side.
 
 ## install
 
-Query 
+Query
 
    pack_install(css_write).
    pack_install(list_util).
 
 
 ## to run
-To run, load `server.pl` and use the `go/1` predicate to start the server, providing the port to run on (e.g. `go(8081).`).
+
+To run, load `example_server.pl` and use the `go/1` predicate to start the server, providing the port to run on (e.g. `go(8081).`).
 
 The app uses [Pengines][pengines] to interact with the client.
 
