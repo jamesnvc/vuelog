@@ -17,13 +17,13 @@
 :- use_module(library(http/html_head), [html_resource/2, html_requires//1]).
 :- use_module(library(http/http_files), [http_reply_from_files/3]).
 
-:- use_module(vue_render, [meal_plan_page//1]).
+:- use_module(example_render, [meal_plan_page//1]).
 
 % main start
-:- use_module(api).
+:- use_module(example_api).
 :- use_module(library(pengines)).
 :- pengine_application(meals_app).
-:- use_module(meals_app:api).
+:- use_module(meals_app:example_api).
 
 %! go(+Port) is det.
 %  Main entry point to start the server.
