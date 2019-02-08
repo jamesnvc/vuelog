@@ -53,7 +53,7 @@ user:body(app, Body) -->
 %  Handler for main meal plain page.
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
-    api:init_state(State),
+    example_api:init_state(State),
     reply_html_page(app,
         title('Eating Plan'),
         \meal_plan_page(State)).
