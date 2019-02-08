@@ -1,7 +1,7 @@
 /** <module> Rendering
 * Predicates for generating HTML, CSS, and Javascript.
 */
-:- module(vue_render, [meal_plan_page//1]).
+:- module(example_render, [meal_plan_page//1]).
 
 :- use_module(library(http/html_write), [html_post//2]).
 :- use_module(library(css_write), [css//1, write_css/2]).
