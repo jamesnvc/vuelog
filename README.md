@@ -23,3 +23,14 @@ Currently, the developer must write a fair amount of Javascript and must include
 The current big question is how best to design a way of hiding this incidental stuff & allow the developer to write mostly Prolog (plus some sort of HTML-generating DCG)?
 
   [pengines]: http://www.swi-prolog.org/pldoc/doc_for?object=section(%27packages/pengines.html%27)
+
+
+## To do:
+
+In no particular order,
+
+ - [ ] Documentation
+ - [ ] Integrate the writing of the Pengine api module better with the writing of the front-end (right now they are entirely separate & the author just needs to know to set things up like the example project).
+ - [ ] Allow for server-side pre-rendering
+ - [ ] Make the HTML DSL look less Vue-specific
+ - [ ] Have some story for purely client-side state (that is, have some state without needing to round-trip to the server)
