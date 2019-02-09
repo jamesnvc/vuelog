@@ -34,3 +34,5 @@ In no particular order,
  - [ ] Allow for server-side pre-rendering
  - [ ] Make the HTML DSL look less Vue-specific
  - [ ] Have some story for purely client-side state (that is, have some state without needing to round-trip to the server)
+ - [ ] Gracefully handle network failures or remote pengine errors
+ - [ ] Compile some of the Prolog to JS & have it run client-side? 😱
