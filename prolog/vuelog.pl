@@ -1,8 +1,8 @@
-:- module(vue_html, [vue_html//1,
-                     vue_context//2,
-                     qvue_html/2,
-                     op(400, xfx, in)
-                    ]).
+:- module(vuelog, [vue_html//1,
+                   vue_context//2,
+                   qvue_html/2,
+                   op(400, xfx, in)
+                  ]).
 
 :- use_module(library(http/html_write), [html//1, html_post//2]).
 :- use_module(library(http/js_write), [javascript/4,
@@ -19,9 +19,9 @@ vue_context(CtxDict, Stuff) -->
         root_element_sel: Elt} :< CtxDict },
     include_js(script(type('text/javascript'),
                 {|javascript(State, PengineName, Elt)||
-                 var appEl = document.querySelector(Elt);
-                 var _updating = false;
-                 var conf = {application: PengineName,
+                 let appEl = document.querySelector(Elt);
+                 let _updating = false;
+                 let conf = {application: PengineName,
                              onsuccess: function() {
                                const newState = this.data[0].S;
                                for (let k in newState) {
@@ -39,7 +39,7 @@ vue_context(CtxDict, Stuff) -->
                                pengine = new Pengine(conf);
                              }
                             };
-                 var pengine = new Pengine(conf);
+                 let pengine = new Pengine(conf);
                  const updateFn = (event) => {
                    if (_updating) return;
                    _updating = true;
@@ -49,7 +49,7 @@ vue_context(CtxDict, Stuff) -->
                    const stateJson = Pengine.stringify(state);
                    pengine.ask(`handle_event(${stateJson}, ${event}, S)`);
                  };
-                 var app = new Vue(
+                 let app = new Vue(
                    {el: appEl,
                     data: State,
                     beforeUpdate: function() {

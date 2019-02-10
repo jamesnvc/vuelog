@@ -1,7 +1,7 @@
-/** <module> Server
-* HTTP server for the meal planner.
+/** <module> Example server
+* Demo of the Vue/Pengine integration
 */
-:- module(server, [go/1]).
+:- module(example_server, [go/1]).
 
 :- use_module(library(http/thread_httpd), [http_server/2]).
 :- use_module(library(http/http_dispatch), [http_redirect/3,
@@ -17,14 +17,13 @@
 :- use_module(library(http/html_head), [html_resource/2, html_requires//1]).
 :- use_module(library(http/http_files), [http_reply_from_files/3]).
 
-%% :- use_module(render, [meal_plan_page//1]).
-:- use_module(vue_render, [meal_plan_page//1]).
+:- use_module(example_render, [meal_plan_page//1]).
 
 % main start
-:- use_module(api).
+:- use_module(example_api).
 :- use_module(library(pengines)).
 :- pengine_application(meals_app).
-:- use_module(meals_app:api).
+:- use_module(meals_app:example_api).
 
 %! go(+Port) is det.
 %  Main entry point to start the server.
@@ -54,7 +53,7 @@ user:body(app, Body) -->
 %  Handler for main meal plain page.
 meal_plan_handler(Request) :-
     memberchk(method(get), Request),
-    api:init_state(State),
+    example_api:init_state(State),
     reply_html_page(app,
         title('Eating Plan'),
         \meal_plan_page(State)).
