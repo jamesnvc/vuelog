@@ -38,3 +38,4 @@ In no particular order,
  - [ ] Compile some of the Prolog to JS & have it run client-side? 😱
  - [ ] Implement more Vue constructs/parameters to components
  - [ ] Expose more [Vue methods](https://vuejs.org/v2/api/#Global-Config)
+ - [ ] Integrate with [`pack(identity)`](https://github.com/Anniepoo/identity)
