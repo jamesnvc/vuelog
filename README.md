@@ -31,9 +31,10 @@ In no particular order,
 
  - [ ] Documentation
  - [ ] Integrate the writing of the Pengine api module better with the writing of the front-end (right now they are entirely separate & the author just needs to know to set things up like the example project).
- - [ ] Allow for server-side pre-rendering
+ - [ ] Allow for server-side pre-rendering (perhaps generate template tags as well as the static data passed in, so the page can be generated on the server like normal HTML, but also include enough information for Vue to take over client-side)
  - [ ] Make the HTML DSL look less Vue-specific
  - [ ] Have some story for purely client-side state (that is, have some state without needing to round-trip to the server)
  - [ ] Gracefully handle network failures or remote pengine errors
  - [ ] Compile some of the Prolog to JS & have it run client-side? 😱
  - [ ] Implement more Vue constructs/parameters to components
+ - [ ] Expose more [Vue methods](https://vuejs.org/v2/api/#Global-Config)
