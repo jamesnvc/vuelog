@@ -36,3 +36,4 @@ In no particular order,
  - [ ] Have some story for purely client-side state (that is, have some state without needing to round-trip to the server)
  - [ ] Gracefully handle network failures or remote pengine errors
  - [ ] Compile some of the Prolog to JS & have it run client-side? 😱
+ - [ ] Implement more Vue constructs/parameters to components
