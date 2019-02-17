@@ -14,7 +14,7 @@
                                    replicate/3,
                                    iterate/3]).
 :- use_module(library(clpfd), [transpose/2]).
-:- use_module(util, [ts_day/2, numlist_desc/3]).
+:- use_module(util, [ts_day/2]).
 
 % State calculations
 
@@ -30,7 +30,8 @@ state_gen_slots, [State1] -->
 state_gen_slots, [State1] -->
     [State0],
     { _{end_day: EndD, start_day: StartD, meals_per_day: PerDay, meals: Meals} :< State0,
-      ts_day(EndTs, EndD), ts_day(StartTs, StartD),
+      ts_day(EndTs, EndD),
+      ts_day(StartTs, StartD),
       NDays is round((EndTs - StartTs) / (3600*24)),
       length(TSlots, PerDay),
       maplist(schedule(Meals, NDays), TSlots),
@@ -165,7 +166,8 @@ meals_next_score([], _, 0) :- !.
 meals_next_score(Meals, Meal, S) :-
     maplist(meals_score(Meal), Meals, Scores),
     length(Meals, NMeals),
-    numlist_desc(NMeals, 1, Ns),
+    numlist(1, NMeals, NsR),
+    reverse(NsR, Ns),
     maplist({NMeals}/[N, Score, AdjScore]>>(
                 % sigmoid function
                 Factor is (1 / (1 + exp(-6*(N / NMeals)))),

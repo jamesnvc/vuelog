@@ -2,8 +2,7 @@
 * Helper predicates.
 */
 :- module(util, [ts_day/2,
-                 listof//2,
-                 numlist_desc/3]).
+                 listof//2]).
 
 %! ts_day(+Ts:timestamp, -Day:string) is det.
 %! ts_day(-Ts:timestamp, +Day:string) is semidet.
@@ -42,15 +41,4 @@ listof(DCG, [E|Rest], false) -->
     ["<!-- </q> -->"],
     listof(DCG, Rest, false).
 
-%! numlist_desc(+A:int, +B:int, -C:list) is semidet.
-%  Like numlist/3 but makes a descending list.
-numlist_desc(A, B, C) :-
-    must_be(integer, A),
-    must_be(integer, B),
-    A >= B,
-    numlist_desc_(A, B, C).
-numlist_desc_(A, A, [A]) :- !.
-numlist_desc_(A, C, [A|D]) :-
-    B is A - 1,
-    numlist_desc_(B, C, D).
 
