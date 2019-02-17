@@ -12,7 +12,7 @@
 include_js(JsTxt) -->
     html_post(js, JsTxt).
 
-:- meta_predicate vue_context(+, :, -, +).
+:- html_meta vue_context(+, html, ?, ?).
 vue_context(CtxDict, Stuff) -->
     { _{initial_state: State,
         pengine_app_name: PengineName,
@@ -76,7 +76,7 @@ vue_context(CtxDict, Stuff) -->
 |})),
     vue_html(Stuff).
 
-:- html_meta vue_html(html, -, +).
+:- html_meta vue_html(html, ?, ?).
 vue_html(Spec) -->
     { qvue_html(Spec, Vued), ! },
     html(Vued).
