@@ -14,7 +14,7 @@
                                    replicate/3,
                                    iterate/3]).
 :- use_module(library(clpfd), [transpose/2]).
-:- use_module(util, [ts_day/2, numlist_desc/3, shuffled/2]).
+:- use_module(util, [ts_day/2, numlist_desc/3]).
 
 % State calculations
 
@@ -183,7 +183,7 @@ minimum_with(Project, List, Minimum) :-
     list_util:minimum_by([O, T1-_, T2-_]>>compare(O, T1, T2), Pairs, _-Minimum).
 
 best_next_meal(Meals, Schedule, NextMeal) :-
-    shuffled(Meals, RandMeals),
+    random_permutation(Meals, RandMeals),
     % Note that minimum_by (which minimum_with calls) waits for the
     % input list to be ground, so the dicts must have an actual tag,
     % otherwise this doesn't unify properly
