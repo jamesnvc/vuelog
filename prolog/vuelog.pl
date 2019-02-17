@@ -4,7 +4,7 @@
                    op(400, xfx, in)
                   ]).
 
-:- use_module(library(http/html_write), [html//1, html_post//2]).
+:- use_module(library(http/html_write), [html//1, html_post//2, op(_, _, html_meta)]).
 :- use_module(library(http/js_write), [javascript/4,
                                        js_expression//1]).
 :- use_module(library(http/json), [json_write_dict/3]).
@@ -76,7 +76,7 @@ vue_context(CtxDict, Stuff) -->
 |})),
     vue_html(Stuff).
 
-:- meta_predicate vue_html(:, -, +).
+:- html_meta vue_html(html, -, +).
 vue_html(Spec) -->
     { qvue_html(Spec, Vued), ! },
     html(Vued).
