@@ -4,6 +4,8 @@
 :- module(example_api, [init_state/1, handle_event/3]).
 
 
+:- use_module(library(apply_macros)).
+:- use_module(library(apply)).
 :- use_module(library(http/json), [atom_json_dict/3]).
 :- use_module(library(ordsets), [list_to_ord_set/2,
                                  ord_intersection/3,
@@ -80,12 +82,15 @@ init_state(State) :-
                    meals_per_day: 1,
                    meals: [meal{name: "Spaghetti d'olio",
                                 days: 1,
+                                enabled: true,
                                 tags: [pasta, vege, pasta]},
                            meal{name: "Caldo Verde",
                                 days: 3,
+                                enabled: true,
                                 tags: [vege, soup, portuguese]},
                            meal{name: "Steak",
                                 days: 1,
+                                enabled: false,
                                 tags: [meat]}]},
     phrase(update_state, [State0], [State]).
 
@@ -110,7 +115,7 @@ handle_event(State0,
     split(TagsCodes, 0',, TagsCodesList),
     maplist(atom_codes, Tags, TagsCodesList),
     number_string(Days, DaysStr),
-    NewMeal = meal{name: Name, days: Days, tags: Tags},
+    NewMeal = meal{name: Name, days: Days, tags: Tags, enabled: true},
     phrase(add_meal(NewMeal), [State0], [State1]), !.
 handle_event(State, Event, State) :-
     debug(pengine, "Unknown Pengine event ~w ~w", [State, Event]).
@@ -193,8 +198,11 @@ best_next_meal(Meals, Schedule, NextMeal) :-
 
 meal_fits(N, Meal) :- Meal.days =< N.
 
+meal_enabled(Meal) :- get_dict(enabled, Meal, true).
+
 schedule(Meals, N, Schedule) :-
-    schedule_(Meals, N, [], RSchedule),
+    include(meal_enabled, Meals, EnabledMeals),
+    schedule_(EnabledMeals, N, [], RSchedule),
     reverse(RSchedule, Schedule).
 schedule_(_, 0, Schedule, Schedule) :- !.
 schedule_(Meals, N, CurrentSchedule, Schedule) :-

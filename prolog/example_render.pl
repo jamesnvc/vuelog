@@ -40,6 +40,10 @@ meals -->
                          br([]),
                          p(['Makes a meal for ', $('meal.days'), ' days']),
                          br([]),
+                         label([],
+                               ["Enabled?",
+                                vue_input([type(checkbox), name(toggle), model('meal.enabled')])]),
+                         br([]),
                          vue_list(tag in 'meal.tags',
                                   span([], [$(tag), &(nbsp)]))]))),
               \add_meal]).
