@@ -120,7 +120,6 @@ vue_html_expand(A, A).
 
 vue_html_expand_attrs(Attrs, ExAttrs) :-
     is_list(Attrs), !,
-    debug(xxx, "Expanding attrs ~w", [Attrs]),
     maplist(vue_html_expand_attr, Attrs, ExAttrs).
 vue_html_expand_attrs(Attr, ExAttr) :-
     vue_html_expand_attr(Attr, ExAttr).
@@ -128,7 +127,6 @@ vue_html_expand_attrs(Attr, ExAttr) :-
 vue_html_expand_attr(model(Model), 'v-model'(Model)).
 vue_html_expand_attr(click(Event), '@click'('handleEvent("' + Event + '")')).
 vue_html_expand_attr(@(AttrProps), VBindAttrProps) :-
-    debug(xxx, "Expanding ~w", [AttrProps]),
     AttrProps =.. [Attr, PropOrProps],
     format(atom(VBindAtom), "v-bind:~w", [Attr]),
     ensure_list(PropOrProps, Props),
