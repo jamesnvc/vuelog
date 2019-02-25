@@ -96,9 +96,8 @@ vue_html_expand(vue_form(submit(Event), Elements),
                 form(['@submit.prevent'('handleFormEvent("' + Event + '", $event)')],
                      ExElements)) :-
     qvue_html(Elements, ExElements).
-vue_html_expand(vue_input(Attrs),
-                input(['v-model'(Prop)|OutAttrs], [])) :-
-    selectchk(model(Prop), Attrs, OutAttrs).
+vue_html_expand(vue_input(Attrs), input(ExAttrs, [])) :-
+    vue_html_expand_attrs(Attrs, ExAttrs).
 vue_html_expand(vue_button(click(Event), Text),
                 button('@click'('handleEvent("' + Event + '")'),
                        Text)).
@@ -107,7 +106,8 @@ vue_html_expand(vue_list(in(Key, Vals),
                 ListTemplateElt) :-
     Container =.. [ContainerElt, Props_, Children],
     format(string(BindingAtom), "~w in ~w", [Key, Vals]),
-    Props = ['v-for'(BindingAtom)|Props_],
+    vue_html_expand_attrs(Props_, ExProps_),
+    Props = ['v-for'(BindingAtom)|ExProps_],
     qvue_html(Children, TemplateBody),
     ListTemplateElt =.. [ContainerElt, Props, TemplateBody].
 vue_html_expand($(Var), TemplateVar) :-
@@ -115,9 +115,35 @@ vue_html_expand($(Var), TemplateVar) :-
 vue_html_expand(ElAttrsChildren, ExElt) :-
     ElAttrsChildren =.. [El, Attrs, Children],
     qvue_html(Children, ExChildren),
-    ExElt =.. [El, Attrs, ExChildren].
+    vue_html_expand_attrs(Attrs, ExAttrs),
+    ExElt =.. [El, ExAttrs, ExChildren].
 vue_html_expand(ElChildren, ExElt) :-
     ElChildren =.. [El, Children],
     qvue_html(Children, ExChildren),
     ExElt =.. [El, ExChildren].
 vue_html_expand(A, A).
+
+vue_html_expand_attrs(Attrs, ExAttrs) :-
+    is_list(Attrs), !,
+    debug(xxx, "Expanding attrs ~w", [Attrs]),
+    maplist(vue_html_expand_attr, Attrs, ExAttrs).
+vue_html_expand_attrs(Attr, ExAttr) :-
+    vue_html_expand_attr(Attr, ExAttr).
+
+vue_html_expand_attr(model(Model), 'v-model'(Model)).
+vue_html_expand_attr(click(Event), '@click'('handleEvent("' + Event + '")')).
+vue_html_expand_attr(@(AttrProps), VBindAttrProps) :-
+    debug(xxx, "Expanding ~w", [AttrProps]),
+    AttrProps =.. [Attr, PropOrProps],
+    format(atom(VBindAtom), "v-bind:~w", [Attr]),
+    ensure_list(PropOrProps, Props),
+    maplist([K=V, KV]>>(format(atom(KV), "'~w': ~w", [K, V])),
+            Props, PropBindings),
+    atomic_list_concat(PropBindings, ', ', PropBinding),
+    atomic_list_concat(['{', PropBinding, '}'], Bindings),
+    VBindAttrProps =.. [VBindAtom, Bindings].
+vue_html_expand_attr(A, A).
+
+
+ensure_list(Xs, Xs) :- is_list(Xs), !.
+ensure_list(X, [X]).

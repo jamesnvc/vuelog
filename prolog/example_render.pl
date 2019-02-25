@@ -18,31 +18,37 @@ meal_plan_page(State) -->
                 div([id(app)],
                     [div(class('parameters'),
                          [label(["Start Date",
-                                 vue_input([type(date), model(start_day)])]),
+                                 input([type(date), model(start_day)], [])]),
                           label(["End Date",
-                                 vue_input([type(date), model(end_day)])]),
+                                 input([type(date), model(end_day)], [])]),
                           label(["Meals per day",
                                  % XXX: some way to indicate that
                                  % meals_per_day should be treated as
                                  % a number?
-                                 vue_input([type(number), model(meals_per_day)])])]),
+                                 input([type(number), model(meals_per_day)], [])])]),
                      div(class(meals), \meals),
                      div(class(schedule),
                          [h2("Schedule"),
-                          vue_button(click(rerun), "New Schedule"),
+                          button(click(rerun), "New Schedule"),
                           \calendar])])).
 
+meals_css -->
+    css(['.meal'(color(gray),
+                '&.active'(color(black)))
+        ]).
+
 meals -->
-    vue_html([h2("Menu Options"),
+    vue_html([\include_css(meals_css),
+              h2("Menu Options"),
               ul(vue_list(meal in meals,
-                     li([class(meal)],
+                     li([class(meal), @(class(active='meal.enabled'))],
                         [$('meal.name'),
                          br([]),
                          p(['Makes a meal for ', $('meal.days'), ' days']),
                          br([]),
                          label([],
                                ["Enabled?",
-                                vue_input([type(checkbox), name(toggle), model('meal.enabled')])]),
+                                input([type(checkbox), name(toggle), model('meal.enabled')], [])]),
                          br([]),
                          vue_list(tag in 'meal.tags',
                                   span([], [$(tag), &(nbsp)]))]))),
