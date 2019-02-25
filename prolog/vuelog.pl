@@ -96,11 +96,6 @@ vue_html_expand(vue_form(submit(Event), Elements),
                 form(['@submit.prevent'('handleFormEvent("' + Event + '", $event)')],
                      ExElements)) :-
     qvue_html(Elements, ExElements).
-vue_html_expand(vue_input(Attrs), input(ExAttrs, [])) :-
-    vue_html_expand_attrs(Attrs, ExAttrs).
-vue_html_expand(vue_button(click(Event), Text),
-                button('@click'('handleEvent("' + Event + '")'),
-                       Text)).
 vue_html_expand(vue_list(in(Key, Vals),
                          Container),
                 ListTemplateElt) :-
