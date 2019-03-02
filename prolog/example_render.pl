@@ -11,12 +11,21 @@ include_css(CssDcg) -->
     { write_css(CssDcg, CssTxt) },
     html_post(css, style([], CssTxt)).
 
+page_css -->
+    css([body('background-color'(gray)),
+         '#app'([margin('1em'),
+                 padding('1em'),
+                 'font-family'('sans-serif'),
+                 'border-radius'('5px'),
+                 'background-color'(white)])]).
+
 meal_plan_page(State) -->
     vue_context(_{initial_state: State,
                   pengine_app_name: meals_app,
                   root_element_sel: "#app"},
                 div([id(app)],
-                    [div(class('parameters'),
+                    [\include_css(page_css),
+                     div(class('parameters'),
                          [label(["Start Date",
                                  input([type(date), model(start_day)], [])]),
                           label(["End Date",
@@ -29,29 +38,51 @@ meal_plan_page(State) -->
                      div(class(meals), \meals),
                      div(class(schedule),
                          [h2("Schedule"),
-                          button(click(rerun), "New Schedule"),
+                          button(click(rerun), "Generate New Schedule"),
                           \calendar])])).
 
 meals_css -->
-    css(['.meal'(color(gray),
-                '&.active'(color(black)))
-        ]).
+    css(['.meals-list'(
+             [display(flex),
+              'flex-direction'(row),
+             'flex-wrap'(wrap)],
+            ['.meal'(
+                 [color(gray),
+                  'list-style-type'(none),
+                  'padding'('0.5em'),
+                  'margin'('0.5em'),
+                  'border'('1px solid darkgray'),
+                  'border-radius'('5px')
+                 ],
+                 ['&.active'(color(black)),
+
+                  label(display(block)),
+
+                  'input[type=checkbox]'(display(none))
+                 ])
+            ])]).
 
 meals -->
     vue_html([\include_css(meals_css),
               h2("Menu Options"),
-              ul(vue_list(meal in meals,
-                     li([class(meal), @(class(active='meal.enabled'))],
-                        [$('meal.name'),
-                         br([]),
-                         p(['Makes a meal for ', $('meal.days'), ' days']),
-                         br([]),
-                         label([],
-                               ["Enabled?",
-                                input([type(checkbox), name(toggle), model('meal.enabled')], [])]),
-                         br([]),
-                         vue_list(tag in 'meal.tags',
-                                  span([], [$(tag), &(nbsp)]))]))),
+              ul([class('meals-list')],
+                 vue_list(meal in meals,
+                          li([class(meal), @(class(active='meal.enabled'))],
+                             label([],
+                                   [$('meal.name'),
+                                    br([]),
+                                    p(['Makes a meal for ', $('meal.days'),
+                                       ' day', when('meal.days > 1', 's')]),
+                                    br([]),
+                                    if('meal.enabled',
+                                       span([$('meal.name'), " is enabled"]),
+                                       span([$('meal.name'), " is disabled"])),
+                                    input([type(checkbox), name(toggle),
+                                           model('meal.enabled')], []),
+                                    br([]),
+                                    span("Tags: "),
+                                    vue_list(tag in 'meal.tags',
+                                             span([], [$(tag), &(nbsp)]))])))),
               \add_meal]).
 
 
