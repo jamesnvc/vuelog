@@ -107,6 +107,13 @@ vue_html_expand(vue_list(in(Key, Vals),
     ListTemplateElt =.. [ContainerElt, Props, TemplateBody].
 vue_html_expand($(Var), TemplateVar) :-
     format(string(TemplateVar), "{{ ~w }}", [Var]).
+vue_html_expand(if(Cond, ThenEl, ElseEl),
+                template([template(['v-if'(Cond)], ThenElEx),
+                          template(['v-else'], ElseElEx)])) :-
+    qvue_html(ThenEl, ThenElEx),
+    qvue_html(ElseEl, ElseElEx).
+vue_html_expand(when(Cond, ThenEl), template('v-if'(Cond), ThenElEx)) :-
+    qvue_html(ThenEl, ThenElEx).
 vue_html_expand(ElAttrsChildren, ExElt) :-
     ElAttrsChildren =.. [El, Attrs, Children],
     qvue_html(Children, ExChildren),
