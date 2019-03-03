@@ -39,4 +39,5 @@ In no particular order,
  - [ ] Implement more Vue constructs/parameters to components
  - [ ] Expose more [Vue methods](https://vuejs.org/v2/api/#Global-Config)
  - [ ] Integrate with [`pack(identity)`](https://github.com/Anniepoo/identity)
- - [ ] Allow using [`v-bind:`](https://vuejs.org/v2/api/#v-bind) more naturally from prolog
+ - [X] Allow using [`v-bind:`](https://vuejs.org/v2/api/#v-bind) more naturally from prolog
+ - [ ] Allow adding methods to Vue state (e.g. for computed properties)
